@@ -1,10 +1,14 @@
 package game;
 
+import com.mrjaffesclass.apcs.messenger.MessageHandler;
+import com.mrjaffesclass.apcs.messenger.Messenger;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
 
-public class GamePanel extends JPanel implements GameEngine {
+public class GamePanel extends JPanel implements GameEngine, MessageHandler {
 
     //reversi board
     int[][] board;
@@ -30,6 +34,7 @@ public class GamePanel extends JPanel implements GameEngine {
 
     Timer player1HandlerTimer;
     Timer player2HandlerTimer;
+    private final Messenger mvcMessaging;
 
     @Override
     public int getBoardValue(int i,int j){
@@ -41,7 +46,10 @@ public class GamePanel extends JPanel implements GameEngine {
         board[i][j] = value;
     }
 
-    public GamePanel(){
+    public GamePanel(Messenger messages){
+
+        mvcMessaging = messages;
+
         this.setBackground(Color.WHITE);
         this.setLayout(new BorderLayout());
 
@@ -84,19 +92,24 @@ public class GamePanel extends JPanel implements GameEngine {
         this.add(sidebar,BorderLayout.WEST);
         this.add(reversiBoard);
 
+        mvcMessaging.subscribe("view:buttonClicked", this);
+        mvcMessaging.subscribe("view:boardUpdate", this);
+        mvcMessaging.subscribe("move:player", this);
+        mvcMessaging.subscribe("game:finished", this);
+
         //
         updateBoardInfo();
         updateTotalScore();
 
         //AI Handler Timer (to unfreeze gui)
         player1HandlerTimer = new Timer(1000,(ActionEvent e) -> {
-            handleAI(player1);
+            handlePlayer(player1);
             player1HandlerTimer.stop();
             manageTurn();
         });
 
         player2HandlerTimer = new Timer(1000,(ActionEvent e) -> {
-            handleAI(player2);
+            handlePlayer(player2);
             player2HandlerTimer.stop();
             manageTurn();
         });
@@ -119,7 +132,7 @@ public class GamePanel extends JPanel implements GameEngine {
                     }
                 }else{
                     //forfeit this move and pass the turn
-                    System.out.println("Player 1 has no legal moves !");
+                    mvcMessaging.notify("move:player", "Player 1 has no legal moves !");
                     turn = 2;
                     manageTurn();
                 }
@@ -133,14 +146,14 @@ public class GamePanel extends JPanel implements GameEngine {
                     }
                 }else{
                     //forfeit this move and pass the turn
-                    System.out.println("Player 2 has no legal moves !");
+                    mvcMessaging.notify("move:player", "Player 2 has no legal moves !");
                     turn = 1;
                     manageTurn();
                 }
             }
         }else{
             //game finished
-            System.out.println("Game Finished !");
+            mvcMessaging.notify("game:finished", "Game Finished !");
             int winner = BoardHelper.getWinner(board);
             if(winner==1) totalscore1++;
             else if(winner==2) totalscore2++;
@@ -155,9 +168,7 @@ public class GamePanel extends JPanel implements GameEngine {
     public void resetBoard(){
         board = new int[8][8];
         for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                board[i][j]=0;
-            }
+            Arrays.fill(board[i], 0);
         }
         //initial board state
         setBoardValue(3,3,2);
@@ -187,6 +198,8 @@ public class GamePanel extends JPanel implements GameEngine {
 
         score1.setText(player1.playerName() + " : " + p1score);
         score2.setText(player2.playerName() + " : " + p2score);
+        mvcMessaging.notify("view:boardUpdate", "Board Updated");
+
     }
 
     public void updateTotalScore(){
@@ -195,9 +208,17 @@ public class GamePanel extends JPanel implements GameEngine {
     }
 
     @Override
-    public void handleClick(int i,int j){
+    public void handleClick(int i, int j){
         if(awaitForClick && BoardHelper.canPlay(board,turn,i,j)){
-            System.out.println("User Played in : "+ i + " , " + j);
+            mvcMessaging.notify("move:player",
+                    (turn == 1) ?
+                            ("Player 1 ") + "Made Move : "+ i + " , " + j :
+                            ("Player 2 ") + "Made Move : "+ i + " , " + j);
+
+            mvcMessaging.notify("view:buttonClicked",
+                    (turn == 1) ?
+                    ("Player 1 ") + "Placed Piece : "+ i + " , " + j :
+                    ("Player 2 ") + "Placed Piece : "+ i + " , " + j);
 
             //update board
             board = BoardHelper.getNewBoardAfterMove(board,new Point(i,j),turn);
@@ -214,15 +235,20 @@ public class GamePanel extends JPanel implements GameEngine {
         }
     }
 
-    public void handleAI(GamePlayer ai){
-        Point aiPlayPoint = ai.play(board);
-        int i = aiPlayPoint.x;
-        int j = aiPlayPoint.y;
-        if(!BoardHelper.canPlay(board,ai.myMark,i,j)) System.err.println("FATAL : AI Invalid Move !");
-        System.out.println(ai.playerName() + " Played in : "+ i + " , " + j);
+    private MessagePayload createPayload(int fieldNumber, int direction) {
+        return new MessagePayload(fieldNumber, direction);
+    }
+
+    public void handlePlayer(GamePlayer gamePlayer){
+        Point playerPlayPoint = gamePlayer.play(board);
+        int i = playerPlayPoint.x;
+        int j = playerPlayPoint.y;
+        if(!BoardHelper.canPlay(board,gamePlayer.myMark,i,j)) {
+            mvcMessaging.notify("move:player", "Player Played in Invalid Move : " + i + " , " + j);
+        }
 
         //update board
-        board = BoardHelper.getNewBoardAfterMove(board,aiPlayPoint,turn);
+        board = BoardHelper.getNewBoardAfterMove(board,playerPlayPoint,turn);
 
         //advance turn
         turn = (turn == 1) ? 2 : 1;
@@ -230,4 +256,17 @@ public class GamePanel extends JPanel implements GameEngine {
         repaint();
     }
 
+    @Override
+    public void messageHandler(String message, Object messagePayload) {
+        // Remove the substring of "move:" or otherwise from the message
+        String messageName = message.substring(message.indexOf(":")+1);
+        String messageData = message.substring(0, message.indexOf(":"));
+
+        if (messagePayload != null) {
+            System.out.printf("MSG: received by %s: "+messageName+" | "+messagePayload+"\n", messageData);
+        } else {
+            System.out.printf("MSG: received by %s: "+messageName+" | No data sent", messageData);
+        }
+        assert messagePayload != null;
+    }
 }

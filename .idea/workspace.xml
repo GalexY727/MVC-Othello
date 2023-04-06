@@ -7,25 +7,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" name="Default" comment="">
+    <list default="true" id="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" name="Default" comment="remove all parts of ai">
+      <change afterPath="$PROJECT_DIR$/.idea/discord.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/git_toolbox_prj.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/intellij-javadocs-4.0.1.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/game/Controller.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/game/MessagePayload.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/BoardCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/BoardCell.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/BoardHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/BoardHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/GameEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/GameEngine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Reversi.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Reversi.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/GamePanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/GamePanel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/player/GreedyPlayer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/player/HumanPlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/HumanPlayer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/player/RandomPlayer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/player/ai/AIPlayerDynamic.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/player/ai/AIPlayerRealtime.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/player/ai/AIPlayerRealtimeKiller.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/player/ai/AIPlayerStatic.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/player/ai/DynamicEvaluator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/player/ai/Evaluator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/player/ai/Minimax.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/player/ai/OpeningBook.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/player/ai/RealtimeEvaluator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/player/ai/StaticEvaluator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/game/GameWindow.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -551,15 +542,21 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "master",
-    "last_opened_file_path": "/home/jacob/Documents/GitHub/MVC-Othello",
+    "jdk.selected.JAVA_MODULE": "1.8",
+    "last_opened_file_path": "/home/jacob/Downloads/messenger.jar",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
     "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -568,7 +565,7 @@
       <recent name="player.ai" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.GameWindow">
+  <component name="RunManager" selected="Application.Controller">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="HTML_USED" value="false" />
       <option name="WIDTH" value="400" />
@@ -590,8 +587,8 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="GameWindow" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="game.GameWindow" />
+    <configuration name="Controller" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="game.Controller" />
       <module name="Reversi" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <method v="2">
@@ -630,12 +627,12 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="Application.GameWindow" />
+      <item itemvalue="Application.Controller" />
       <item itemvalue="Application.BoardPrinter" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.GameWindow" />
+        <item itemvalue="Application.Controller" />
         <item itemvalue="Application.BoardPrinter" />
       </list>
     </recent_temporary>
@@ -664,8 +661,16 @@
       <workItem from="1680722092104" duration="40000" />
       <workItem from="1680722148465" duration="21000" />
       <workItem from="1680722181521" duration="465000" />
-      <workItem from="1680722778417" duration="1846000" />
+      <workItem from="1680722778417" duration="7370000" />
     </task>
+    <task id="LOCAL-00001" summary="remove all parts of ai">
+      <created>1680807258983</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1680807258983</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
@@ -717,6 +722,14 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="remove all parts of ai" />
+    <option name="LAST_COMMIT_MESSAGE" value="remove all parts of ai" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/player/ai/Minimax.java">
