@@ -1,8 +1,5 @@
 package game;
 
-import player.*;
-import player.ai.*;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -28,8 +25,8 @@ public class GamePanel extends JPanel implements GameEngine {
     JLabel tscore2;
 
 
-    GamePlayer player1 = new AIPlayerRealtimeKiller(1,6,true);
-    GamePlayer player2 = new AIPlayerDynamic(2,6);
+    GamePlayer player1 = new HumanPlayer(1);
+    GamePlayer player2 = new HumanPlayer(2);
 
     Timer player1HandlerTimer;
     Timer player2HandlerTimer;
