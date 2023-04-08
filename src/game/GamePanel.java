@@ -8,7 +8,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
 
-public class GamePanel extends JPanel implements GameEngine, MessageHandler {
+public class GamePanel extends JPanel implements MessageHandler {
 
     //reversi board
     int[][] board;
@@ -30,12 +30,10 @@ public class GamePanel extends JPanel implements GameEngine, MessageHandler {
 
     private final Messenger mvcMessaging;
 
-    @Override
     public int getBoardValue(int i,int j){
         return board[i][j];
     }
 
-    @Override
     public void setBoardValue(int i,int j,int value){
         board[i][j] = value;
     }
@@ -170,8 +168,8 @@ public class GamePanel extends JPanel implements GameEngine, MessageHandler {
             }
         }
 
-        score1.setText(player1.playerName() + " : " + p1score);
-        score2.setText(player2.playerName() + " : " + p2score);
+        score1.setText("Player 1: Black = " + p1score);
+        score2.setText("Player 2: White = " + p2score);
         mvcMessaging.notify("view:boardUpdate", "Board Updated");
 
     }
