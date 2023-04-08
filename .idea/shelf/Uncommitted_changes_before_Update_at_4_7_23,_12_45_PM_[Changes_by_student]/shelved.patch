@@ -1,0 +1,256 @@
+Index: src/game/BoardCell.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package game;\n\nimport javax.swing.*;\nimport java.awt.*;\nimport java.awt.event.MouseEvent;\nimport java.awt.event.MouseListener;\nimport java.awt.font.FontRenderContext;\nimport java.awt.font.LineMetrics;\n\npublic class BoardCell extends JLabel implements MouseListener{\n\n    int i;\n    int j;\n\n    GameEngine ge;\n    JPanel parent;\n\n    public int highlight = 0;\n\n    public String text = \"\";\n\n    public BoardCell(GameEngine ge ,JPanel parent,int i,int j){\n        this.ge = ge;\n        this.parent = parent;\n        this.i = i;\n        this.j = j;\n        this.addMouseListener(this);\n    }\n\n    @Override\n    public void paint(Graphics g) {\n\n        int margin_left = this.getWidth() / 10;\n        int margin_top = this.getHeight() / 10;\n\n        //draw highlight\n        if(highlight == 1) {\n            g.setColor(new Color(138, 177, 62));\n            g.fillRect(0,0,this.getWidth(),this.getHeight());\n            g.setColor(parent.getBackground());\n            g.fillRect(4,4,this.getWidth()-8,this.getHeight()-8);\n        }else if(highlight == 2){\n            g.setColor(new Color(177, 158, 70));\n            g.fillRect(0,0,this.getWidth(),this.getHeight());\n            g.setColor(parent.getBackground());\n            g.fillRect(4,4,this.getWidth()-8,this.getHeight()-8);\n        }else if(highlight == 10){\n            g.setColor(new Color(177, 43, 71));\n            g.fillRect(0,0,this.getWidth(),this.getHeight());\n        }\n\n        //draw border\n        g.setColor(Color.BLACK);\n        g.drawRect(0,0,this.getWidth(),this.getHeight());\n\n        //draw piece\n        int value = ge.getBoardValue(i,j);\n        if(value == 1){\n            g.setColor(Color.BLACK);\n            g.fillOval(margin_left,margin_top,this.getWidth()-2*margin_left,this.getHeight()-2*margin_top);\n        }\n        else if(value == 2) {\n            g.setColor(Color.WHITE);\n            g.fillOval(margin_left,margin_top,this.getWidth()-2*margin_left,this.getHeight()-2*margin_top);\n        }\n\n        if(!text.isEmpty()){\n            g.setColor(new Color(255, 255, 0));\n            Font font = g.getFont();\n            Font nfont = new Font(font.getName(),Font.PLAIN,30);\n            g.setFont(nfont);\n\n            drawStringInCenterOfRectangle(g,0,0,this.getWidth(),this.getHeight(),text);\n        }\n\n        //g.setColor(new Color(100,100,100));\n        //g.drawOval(10,10,this.getWidth()-20,this.getHeight()-20);\n        super.paint(g);\n    }\n\n\n    //Extension function to ease drawing text\n    public void drawStringInCenterOfRectangle(Graphics g,int x,int y,int w,int h,String text){\n        Graphics2D g2 = (Graphics2D) g;\n        Font bfont = g2.getFont();\n        FontRenderContext context = g2.getFontRenderContext();\n        g2.setFont(bfont);\n        int textWidth = (int) bfont.getStringBounds(text, context).getWidth();\n        LineMetrics ln = bfont.getLineMetrics(text, context);\n        int textHeight = (int) (ln.getAscent() + ln.getDescent());\n        int tx = x+(w - textWidth)/2;\n        int ty = (int)((y + h + textHeight)/2 - ln.getDescent());\n        g2.drawString(text, tx, ty);\n    }\n\n    @Override\n    public void mouseClicked(MouseEvent e) {\n\n    }\n\n    @Override\n    public void mousePressed(MouseEvent e) {\n        ge.handleClick(i,j);\n    }\n\n    @Override\n    public void mouseReleased(MouseEvent e) {\n\n    }\n\n    @Override\n    public void mouseEntered(MouseEvent e) {\n\n    }\n\n    @Override\n    public void mouseExited(MouseEvent e) {\n\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/game/BoardCell.java b/src/game/BoardCell.java
+--- a/src/game/BoardCell.java	(revision e7d7713921d070a9739c17467b178411463b7c48)
++++ b/src/game/BoardCell.java	(date 1680896496100)
+@@ -7,20 +7,20 @@
+ import java.awt.font.FontRenderContext;
+ import java.awt.font.LineMetrics;
+ 
+-public class BoardCell extends JLabel implements MouseListener{
++public class BoardCell extends JLabel implements MouseListener {
+ 
+     int i;
+     int j;
+ 
+-    GameEngine ge;
++    GamePanel gamePanel;
+     JPanel parent;
+ 
+     public int highlight = 0;
+ 
+     public String text = "";
+ 
+-    public BoardCell(GameEngine ge ,JPanel parent,int i,int j){
+-        this.ge = ge;
++    public BoardCell(GamePanel gamePanel ,JPanel parent,int i,int j) {
++        this.gamePanel = gamePanel;
+         this.parent = parent;
+         this.i = i;
+         this.j = j;
+@@ -54,7 +54,7 @@
+         g.drawRect(0,0,this.getWidth(),this.getHeight());
+ 
+         //draw piece
+-        int value = ge.getBoardValue(i,j);
++        int value = gamePanel.getBoardValue(i,j);
+         if(value == 1){
+             g.setColor(Color.BLACK);
+             g.fillOval(margin_left,margin_top,this.getWidth()-2*margin_left,this.getHeight()-2*margin_top);
+@@ -100,7 +100,7 @@
+ 
+     @Override
+     public void mousePressed(MouseEvent e) {
+-        ge.handleClick(i,j);
++
+     }
+ 
+     @Override
+Index: src/game/BoardHelper.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package game;\n\nimport java.awt.*;\nimport java.util.ArrayList;\n\npublic class BoardHelper {\n\n    public static boolean isGameFinished(int[][] board) {\n        return !(hasAnyMoves(board, 1) || hasAnyMoves(board, 2));\n    }\n\n\n    public static int getWinner(int[][] board) {\n        if (!isGameFinished(board))\n            //game not finished\n            return -1;\n        else {\n            //count stones\n            int p1s = getPlayerStoneCount(board, 1);\n            int p2s = getPlayerStoneCount(board, 2);\n\n            if (p1s == p2s) {\n                //tie\n                return 0;\n            } else if (p1s > p2s) {\n                //p1 wins\n                return 1;\n            } else {\n                //p2 wins\n                return 2;\n            }\n        }\n    }\n\n    public static int getPlayerStoneCount(int[][] board, int player) {\n        int score = 0;\n        for (int i = 0; i < 8; i++) {\n            for (int j = 0; j < 8; j++) {\n                if (board[i][j] == player) score++;\n            }\n        }\n        return score;\n    }\n\n\n    public static boolean hasAnyMoves(int[][] board, int player) {\n        return getAllPossibleMoves(board, player).size() > 0;\n    }\n\n    public static ArrayList<Point> getAllPossibleMoves(int[][] board, int player) {\n        ArrayList<Point> result = new ArrayList<>();\n        for (int i = 0; i < 8; i++) {\n            for (int j = 0; j < 8; j++) {\n                if (canPlay(board, player, i, j)) {\n                    result.add(new Point(i, j));\n                }\n            }\n        }\n        return result;\n    }\n\n    public static ArrayList<Point> getReversePoints(int[][] board, int player, int i, int j) {\n\n        ArrayList<Point> allReversePoints = new ArrayList<>();\n\n        int mi, mj, c;\n        int oplayer = ((player == 1) ? 2 : 1);\n\n        //move up\n        ArrayList<Point> mupts = new ArrayList<>();\n        mi = i - 1;\n        mj = j;\n        while (mi > 0 && board[mi][mj] == oplayer) {\n            mupts.add(new Point(mi, mj));\n            mi--;\n        }\n        if (mi >= 0 && board[mi][mj] == player && mupts.size() > 0) {\n            allReversePoints.addAll(mupts);\n        }\n\n\n        //move down\n        ArrayList<Point> mdpts = new ArrayList<>();\n        mi = i + 1;\n        mj = j;\n        while (mi < 7 && board[mi][mj] == oplayer) {\n            mdpts.add(new Point(mi, mj));\n            mi++;\n        }\n        if (mi <= 7 && board[mi][mj] == player && mdpts.size() > 0) {\n            allReversePoints.addAll(mdpts);\n        }\n\n        //move left\n        ArrayList<Point> mlpts = new ArrayList<>();\n        mi = i;\n        mj = j - 1;\n        while (mj > 0 && board[mi][mj] == oplayer) {\n            mlpts.add(new Point(mi, mj));\n            mj--;\n        }\n        if (mj >= 0 && board[mi][mj] == player && mlpts.size() > 0) {\n            allReversePoints.addAll(mlpts);\n        }\n\n        //move right\n        ArrayList<Point> mrpts = new ArrayList<>();\n        mi = i;\n        mj = j + 1;\n        while (mj < 7 && board[mi][mj] == oplayer) {\n            mrpts.add(new Point(mi, mj));\n            mj++;\n        }\n        if (mj <= 7 && board[mi][mj] == player && mrpts.size() > 0) {\n            allReversePoints.addAll(mrpts);\n        }\n\n        //move up left\n        ArrayList<Point> mulpts = new ArrayList<>();\n        mi = i - 1;\n        mj = j - 1;\n        while (mi > 0 && mj > 0 && board[mi][mj] == oplayer) {\n            mulpts.add(new Point(mi, mj));\n            mi--;\n            mj--;\n        }\n        if (mi >= 0 && mj >= 0 && board[mi][mj] == player && mulpts.size() > 0) {\n            allReversePoints.addAll(mulpts);\n        }\n\n        //move up right\n        ArrayList<Point> murpts = new ArrayList<>();\n        mi = i - 1;\n        mj = j + 1;\n        while (mi > 0 && mj < 7 && board[mi][mj] == oplayer) {\n            murpts.add(new Point(mi, mj));\n            mi--;\n            mj++;\n        }\n        if (mi >= 0 && mj <= 7 && board[mi][mj] == player && murpts.size() > 0) {\n            allReversePoints.addAll(murpts);\n        }\n\n        //move down left\n        ArrayList<Point> mdlpts = new ArrayList<>();\n        mi = i + 1;\n        mj = j - 1;\n        while (mi < 7 && mj > 0 && board[mi][mj] == oplayer) {\n            mdlpts.add(new Point(mi, mj));\n            mi++;\n            mj--;\n        }\n        if (mi <= 7 && mj >= 0 && board[mi][mj] == player && mdlpts.size() > 0) {\n            allReversePoints.addAll(mdlpts);\n        }\n\n        //move down right\n        ArrayList<Point> mdrpts = new ArrayList<>();\n        mi = i + 1;\n        mj = j + 1;\n        while (mi < 7 && mj < 7 && board[mi][mj] == oplayer) {\n            mdrpts.add(new Point(mi, mj));\n            mi++;\n            mj++;\n        }\n        if (mi <= 7 && mj <= 7 && board[mi][mj] == player && mdrpts.size() > 0) {\n            allReversePoints.addAll(mdrpts);\n        }\n\n        return allReversePoints;\n    }\n\n    public static boolean canPlay(int[][] board, int player, int i, int j) {\n\n        if (board[i][j] != 0) return false;\n\n        int mi, mj, c;\n        int oPlayer = ((player == 1) ? 2 : 1);\n\n        //move up\n        mi = i - 1;\n        mj = j;\n        c = 0;\n        while (mi > 0 && board[mi][mj] == oPlayer) {\n            mi--;\n            c++;\n        }\n        if (mi >= 0 && board[mi][mj] == player && c > 0) return true;\n\n\n        //move down\n        mi = i + 1;\n        mj = j;\n        c = 0;\n        while (mi < 7 && board[mi][mj] == oPlayer) {\n            mi++;\n            c++;\n        }\n        if (mi <= 7 && board[mi][mj] == player && c > 0) return true;\n\n        //move left\n        mi = i;\n        mj = j - 1;\n        c = 0;\n        while (mj > 0 && board[mi][mj] == oPlayer) {\n            mj--;\n            c++;\n        }\n        if (mj >= 0 && board[mi][mj] == player && c > 0) return true;\n\n        //move right\n        mi = i;\n        mj = j + 1;\n        c = 0;\n        while (mj < 7 && board[mi][mj] == oPlayer) {\n            mj++;\n            c++;\n        }\n        if (mj <= 7 && board[mi][mj] == player && c > 0) return true;\n\n        //move up left\n        mi = i - 1;\n        mj = j - 1;\n        c = 0;\n        while (mi > 0 && mj > 0 && board[mi][mj] == oPlayer) {\n            mi--;\n            mj--;\n            c++;\n        }\n        if (mi >= 0 && mj >= 0 && board[mi][mj] == player && c > 0) return true;\n\n        //move up right\n        mi = i - 1;\n        mj = j + 1;\n        c = 0;\n        while (mi > 0 && mj < 7 && board[mi][mj] == oPlayer) {\n            mi--;\n            mj++;\n            c++;\n        }\n        if (mi >= 0 && mj <= 7 && board[mi][mj] == player && c > 0) return true;\n\n        //move down left\n        mi = i + 1;\n        mj = j - 1;\n        c = 0;\n        while (mi < 7 && mj > 0 && board[mi][mj] == oPlayer) {\n            mi++;\n            mj--;\n            c++;\n        }\n        if (mi <= 7 && mj >= 0 && board[mi][mj] == player && c > 0) return true;\n\n        //move down right\n        mi = i + 1;\n        mj = j + 1;\n        c = 0;\n        while (mi < 7 && mj < 7 && board[mi][mj] == oPlayer) {\n            mi++;\n            mj++;\n            c++;\n        }\n        return mi <= 7 && mj <= 7 && board[mi][mj] == player && c > 0;\n\n        //when all hopes fade away\n    }\n\n    public static int[][] getNewBoardAfterMove(int[][] board, Point move, int player) {\n        //get clone of old board\n        int[][] newBoard = new int[8][8];\n        for (int k = 0; k < 8; k++) {\n            System.arraycopy(board[k], 0, newBoard[k], 0, 8);\n        }\n\n        //place piece\n        newBoard[move.x][move.y] = player;\n        //reverse pieces\n        ArrayList<Point> rev = BoardHelper.getReversePoints(newBoard, player, move.x, move.y);\n        for (Point pt : rev) {\n            newBoard[pt.x][pt.y] = player;\n        }\n\n        return newBoard;\n    }\n\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/game/BoardHelper.java b/src/game/BoardHelper.java
+--- a/src/game/BoardHelper.java	(revision e7d7713921d070a9739c17467b178411463b7c48)
++++ b/src/game/BoardHelper.java	(date 1680896409587)
+@@ -16,8 +16,8 @@
+             return -1;
+         else {
+             //count stones
+-            int p1s = getPlayerStoneCount(board, 1);
+-            int p2s = getPlayerStoneCount(board, 2);
++            int p1s = getPlayerScore(board, 1);
++            int p2s = getPlayerScore(board, 2);
+ 
+             if (p1s == p2s) {
+                 //tie
+@@ -32,7 +32,7 @@
+         }
+     }
+ 
+-    public static int getPlayerStoneCount(int[][] board, int player) {
++    public static int getPlayerScore(int[][] board, int player) {
+         int score = 0;
+         for (int i = 0; i < 8; i++) {
+             for (int j = 0; j < 8; j++) {
+Index: src/game/GamePlayer.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/game/GamePlayer.java b/src/game/Player.java
+rename from src/game/GamePlayer.java
+rename to src/game/Player.java
+--- a/src/game/GamePlayer.java	(revision e7d7713921d070a9739c17467b178411463b7c48)
++++ b/src/game/Player.java	(date 1680895134571)
+@@ -2,17 +2,15 @@
+ 
+ import java.awt.*;
+ 
+-public abstract class GamePlayer {
++public class Player {
+ 
+-    protected int myMark;
+-    public GamePlayer(int mark){
+-        myMark = mark;
++    protected int color;
++    public Player(int color){
++        this.color = color;
+     }
+ 
+-    abstract public boolean isUserPlayer();
+-
+-    abstract public String playerName();
+-
+-    abstract public Point play(int[][] board);
+-
+-}
++    public Point play(int[][] board) {
++        return null;
++    }
++
++}
+\ No newline at end of file
+Index: src/game/GamePanel.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package game;\n\nimport com.mrjaffesclass.apcs.messenger.MessageHandler;\nimport com.mrjaffesclass.apcs.messenger.Messenger;\n\nimport javax.swing.*;\nimport java.awt.*;\nimport java.awt.event.ActionEvent;\nimport java.util.Arrays;\n\npublic class GamePanel extends JPanel implements GameEngine, MessageHandler {\n\n    //reversi board\n    int[][] board;\n\n    //player turn\n    //black plays first\n    int turn = 1;\n\n    //swing elements\n    BoardCell[][] cells;\n    JLabel score1;\n    JLabel score2;\n\n    int totalscore1 = 0;\n    int totalscore2 = 0;\n\n    JLabel tscore1;\n    JLabel tscore2;\n\n\n    GamePlayer player1 = new HumanPlayer(1);\n    GamePlayer player2 = new HumanPlayer(2);\n\n    Timer player1HandlerTimer;\n    Timer player2HandlerTimer;\n    private final Messenger mvcMessaging;\n\n    @Override\n    public int getBoardValue(int i,int j){\n        return board[i][j];\n    }\n\n    @Override\n    public void setBoardValue(int i,int j,int value){\n        board[i][j] = value;\n    }\n\n    public GamePanel(Messenger messages){\n\n        mvcMessaging = messages;\n\n        this.setBackground(Color.WHITE);\n        this.setLayout(new BorderLayout());\n\n        JPanel reversiBoard = new JPanel();\n        reversiBoard.setLayout(new GridLayout(8,8));\n        reversiBoard.setPreferredSize(new Dimension(500,500));\n        reversiBoard.setBackground(new Color(41,100, 59));\n\n        //init board\n        resetBoard();\n\n        cells = new BoardCell[8][8];\n        for (int i = 0; i < 8; i++) {\n            for (int j = 0; j < 8; j++) {\n                cells[i][j] = new BoardCell(this,reversiBoard,i,j);\n                reversiBoard.add(cells[i][j]);\n            }\n        }\n\n\n        JPanel sidebar = new JPanel();\n        sidebar.setLayout(new BoxLayout(sidebar,BoxLayout.Y_AXIS));\n        sidebar.setPreferredSize(new Dimension(200,0));\n\n        score1 = new JLabel(\"Score 1\");\n        score2 = new JLabel(\"Score 2\");\n\n        tscore1 = new JLabel(\"Total Score 1\");\n        tscore2 = new JLabel(\"Total Score 2\");\n\n        sidebar.add(score1);\n        sidebar.add(score2);\n\n        sidebar.add(new JLabel(\"-----------\"));\n\n        sidebar.add(tscore1);\n        sidebar.add(tscore2);\n\n\n        this.add(sidebar,BorderLayout.WEST);\n        this.add(reversiBoard);\n\n        mvcMessaging.subscribe(\"view:buttonClicked\", this);\n        mvcMessaging.subscribe(\"view:boardUpdate\", this);\n        mvcMessaging.subscribe(\"move:player\", this);\n        mvcMessaging.subscribe(\"game:finished\", this);\n\n        //\n        updateBoardInfo();\n        updateTotalScore();\n\n        //AI Handler Timer (to unfreeze gui)\n        player1HandlerTimer = new Timer(1000,(ActionEvent e) -> {\n            handlePlayer(player1);\n            player1HandlerTimer.stop();\n            manageTurn();\n        });\n\n        player2HandlerTimer = new Timer(1000,(ActionEvent e) -> {\n            handlePlayer(player2);\n            player2HandlerTimer.stop();\n            manageTurn();\n        });\n\n        manageTurn();\n    }\n\n    private boolean awaitForClick = false;\n\n    public void manageTurn(){\n        if(BoardHelper.hasAnyMoves(board,1) || BoardHelper.hasAnyMoves(board,2)) {\n            updateBoardInfo();\n            if (turn == 1) {\n                if(BoardHelper.hasAnyMoves(board,1)) {\n                    if (player1.isUserPlayer()) {\n                        awaitForClick = true;\n                        //after click this function should be call backed\n                    } else {\n                        player1HandlerTimer.start();\n                    }\n                }else{\n                    //forfeit this move and pass the turn\n                    mvcMessaging.notify(\"move:player\", \"Player 1 has no legal moves !\");\n                    turn = 2;\n                    manageTurn();\n                }\n            } else {\n                if(BoardHelper.hasAnyMoves(board,2)) {\n                    if (player2.isUserPlayer()) {\n                        awaitForClick = true;\n                        //after click this function should be call backed\n                    } else {\n                        player2HandlerTimer.start();\n                    }\n                }else{\n                    //forfeit this move and pass the turn\n                    mvcMessaging.notify(\"move:player\", \"Player 2 has no legal moves !\");\n                    turn = 1;\n                    manageTurn();\n                }\n            }\n        }else{\n            //game finished\n            mvcMessaging.notify(\"game:finished\", \"Game Finished !\");\n            int winner = BoardHelper.getWinner(board);\n            if(winner==1) totalscore1++;\n            else if(winner==2) totalscore2++;\n            updateTotalScore();\n            //restart\n            //resetBoard();\n            //turn=1;\n            //manageTurn();\n        }\n    }\n\n    public void resetBoard(){\n        board = new int[8][8];\n        for (int i = 0; i < 8; i++) {\n            Arrays.fill(board[i], 0);\n        }\n        //initial board state\n        setBoardValue(3,3,2);\n        setBoardValue(3,4,1);\n        setBoardValue(4,3,1);\n        setBoardValue(4,4,2);\n    }\n\n    //update highlights on possible moves and scores\n    public void updateBoardInfo(){\n\n        int p1score = 0;\n        int p2score = 0;\n\n        for (int i = 0; i < 8; i++) {\n            for (int j = 0; j < 8; j++) {\n                if(board[i][j] == 1) p1score++;\n                if(board[i][j] == 2) p2score++;\n\n                if(BoardHelper.canPlay(board,turn,i,j)){\n                    cells[i][j].highlight = 1;\n                }else{\n                    cells[i][j].highlight = 0;\n                }\n            }\n        }\n\n        score1.setText(player1.playerName() + \" : \" + p1score);\n        score2.setText(player2.playerName() + \" : \" + p2score);\n        mvcMessaging.notify(\"view:boardUpdate\", \"Board Updated\");\n\n    }\n\n    public void updateTotalScore(){\n        tscore1.setText(player1.playerName() + \" : \" + totalscore1);\n        tscore2.setText(player2.playerName() + \" : \" + totalscore2);\n    }\n\n    @Override\n    public void handleClick(int i, int j){\n        if(awaitForClick && BoardHelper.canPlay(board,turn,i,j)){\n            mvcMessaging.notify(\"move:player\",\n                    (turn == 1) ?\n                            (\"Player 1 \") + \"Made Move : \"+ i + \" , \" + j :\n                            (\"Player 2 \") + \"Made Move : \"+ i + \" , \" + j);\n\n            mvcMessaging.notify(\"view:buttonClicked\",\n                    (turn == 1) ?\n                    (\"Player 1 \") + \"Placed Piece : \"+ i + \" , \" + j :\n                    (\"Player 2 \") + \"Placed Piece : \"+ i + \" , \" + j);\n\n            //update board\n            board = BoardHelper.getNewBoardAfterMove(board,new Point(i,j),turn);\n\n            //advance turn\n            turn = (turn == 1) ? 2 : 1;\n\n            repaint();\n\n            awaitForClick = false;\n\n            //callback\n            manageTurn();\n        }\n    }\n\n    private MessagePayload createPayload(int fieldNumber, int direction) {\n        return new MessagePayload(fieldNumber, direction);\n    }\n\n    public void handlePlayer(GamePlayer gamePlayer){\n        Point playerPlayPoint = gamePlayer.play(board);\n        int i = playerPlayPoint.x;\n        int j = playerPlayPoint.y;\n        if(!BoardHelper.canPlay(board,gamePlayer.myMark,i,j)) {\n            mvcMessaging.notify(\"move:player\", \"Player Played in Invalid Move : \" + i + \" , \" + j);\n        }\n\n        //update board\n        board = BoardHelper.getNewBoardAfterMove(board,playerPlayPoint,turn);\n\n        //advance turn\n        turn = (turn == 1) ? 2 : 1;\n\n        repaint();\n    }\n\n    @Override\n    public void messageHandler(String message, Object messagePayload) {\n        // Remove the substring of \"move:\" or otherwise from the message\n        String messageName = message.substring(message.indexOf(\":\")+1);\n        String messageData = message.substring(0, message.indexOf(\":\"));\n\n        if (messagePayload != null) {\n            System.out.printf(\"MSG: received by %s: \"+messageName+\" | \"+messagePayload+\"\\n\", messageData);\n        } else {\n            System.out.printf(\"MSG: received by %s: \"+messageName+\" | No data sent\", messageData);\n        }\n        assert messagePayload != null;\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/game/GamePanel.java b/src/game/GamePanel.java
+--- a/src/game/GamePanel.java	(revision e7d7713921d070a9739c17467b178411463b7c48)
++++ b/src/game/GamePanel.java	(date 1680895685206)
+@@ -8,7 +8,7 @@
+ import java.awt.event.ActionEvent;
+ import java.util.Arrays;
+ 
+-public class GamePanel extends JPanel implements GameEngine, MessageHandler {
++public class GamePanel extends JPanel implements MessageHandler {
+ 
+     //reversi board
+     int[][] board;
+@@ -36,12 +36,10 @@
+     Timer player2HandlerTimer;
+     private final Messenger mvcMessaging;
+ 
+-    @Override
+     public int getBoardValue(int i,int j){
+         return board[i][j];
+     }
+ 
+-    @Override
+     public void setBoardValue(int i,int j,int value){
+         board[i][j] = value;
+     }
+@@ -123,13 +121,9 @@
+         if(BoardHelper.hasAnyMoves(board,1) || BoardHelper.hasAnyMoves(board,2)) {
+             updateBoardInfo();
+             if (turn == 1) {
+-                if(BoardHelper.hasAnyMoves(board,1)) {
+-                    if (player1.isUserPlayer()) {
+-                        awaitForClick = true;
+-                        //after click this function should be call backed
+-                    } else {
+-                        player1HandlerTimer.start();
+-                    }
++                if(BoardHelper.openSpaces(board,1)) {
++                    awaitForClick = true;
++                    //after click this function should be call backed
+                 }else{
+                     //forfeit this move and pass the turn
+                     mvcMessaging.notify("move:player", "Player 1 has no legal moves !");
+@@ -137,25 +131,21 @@
+                     manageTurn();
+                 }
+             } else {
+-                if(BoardHelper.hasAnyMoves(board,2)) {
+-                    if (player2.isUserPlayer()) {
+-                        awaitForClick = true;
+-                        //after click this function should be call backed
+-                    } else {
+-                        player2HandlerTimer.start();
+-                    }
+-                }else{
++                if (BoardHelper.openSpaces(board,2)) {
++                    awaitForClick = true;
++                    //after click this function should be call backed
++                } else {
+                     //forfeit this move and pass the turn
+                     mvcMessaging.notify("move:player", "Player 2 has no legal moves !");
+                     turn = 1;
+                     manageTurn();
+                 }
+             }
+-        }else{
++        } else {
+             //game finished
+             mvcMessaging.notify("game:finished", "Game Finished !");
+             int winner = BoardHelper.getWinner(board);
+-            if(winner==1) totalscore1++;
++            if (winner==1) totalscore1++;
+             else if(winner==2) totalscore2++;
+             updateTotalScore();
+             //restart
+@@ -196,8 +186,8 @@
+             }
+         }
+ 
+-        score1.setText(player1.playerName() + " : " + p1score);
+-        score2.setText(player2.playerName() + " : " + p2score);
++        score1.setText("Player 1: Black = " + p1score);
++        score2.setText("Player 2: White = " + p2score);
+         mvcMessaging.notify("view:boardUpdate", "Board Updated");
+ 
+     }
+@@ -207,7 +197,6 @@
+         tscore2.setText(player2.playerName() + " : " + totalscore2);
+     }
+ 
+-    @Override
+     public void handleClick(int i, int j){
+         if(awaitForClick && BoardHelper.canPlay(board,turn,i,j)){
+             mvcMessaging.notify("move:player",
+Index: src/game/HumanPlayer.java
+===================================================================
+diff --git a/src/game/HumanPlayer.java b/src/game/HumanPlayer.java
+deleted file mode 100644
+--- a/src/game/HumanPlayer.java	(revision e7d7713921d070a9739c17467b178411463b7c48)
++++ /dev/null	(revision e7d7713921d070a9739c17467b178411463b7c48)
+@@ -1,28 +0,0 @@
+-package game;
+-
+-import game.GamePlayer;
+-
+-import java.awt.*;
+-
+-public class HumanPlayer extends GamePlayer {
+-
+-    public HumanPlayer(int mark) {
+-        super(mark);
+-    }
+-
+-    @Override
+-    public boolean isUserPlayer() {
+-        return true;
+-    }
+-
+-    @Override
+-    public String playerName() {
+-        return "User" ;
+-    }
+-
+-    @Override
+-    public Point play(int[][] board) {
+-        return null;
+-    }
+-
+-}

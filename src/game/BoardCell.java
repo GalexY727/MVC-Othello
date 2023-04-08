@@ -90,7 +90,7 @@ public class BoardCell extends JLabel implements MouseListener{
         int textHeight = (int) (ln.getAscent() + ln.getDescent());
         int tx = x+(w - textWidth)/2;
         int ty = (int)((y + h + textHeight)/2 - ln.getDescent());
-        g2.drawString(text, (int)tx, (int)ty);
+        g2.drawString(text, tx, ty);
     }
 
     @Override

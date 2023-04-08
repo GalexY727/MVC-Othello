@@ -1,0 +1,836 @@
+Index: src/game/BoardHelper.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package game;\n\nimport java.awt.*;\nimport java.util.ArrayList;\n\npublic class BoardHelper {\n\n    public static boolean isGameFinished(int[][] board) {\n        return !(hasAnyMoves(board, 1) || hasAnyMoves(board, 2));\n    }\n\n\n    public static int getWinner(int[][] board) {\n        if (!isGameFinished(board))\n            //game not finished\n            return -1;\n        else {\n            //count stones\n            int p1s = getPlayerStoneCount(board, 1);\n            int p2s = getPlayerStoneCount(board, 2);\n\n            if (p1s == p2s) {\n                //tie\n                return 0;\n            } else if (p1s > p2s) {\n                //p1 wins\n                return 1;\n            } else {\n                //p2 wins\n                return 2;\n            }\n        }\n    }\n\n    public static int getPlayerStoneCount(int[][] board, int player) {\n        int score = 0;\n        for (int i = 0; i < 8; i++) {\n            for (int j = 0; j < 8; j++) {\n                if (board[i][j] == player) score++;\n            }\n        }\n        return score;\n    }\n\n\n    public static boolean hasAnyMoves(int[][] board, int player) {\n        return getAllPossibleMoves(board, player).size() > 0;\n    }\n\n    public static ArrayList<Point> getAllPossibleMoves(int[][] board, int player) {\n        ArrayList<Point> result = new ArrayList<>();\n        for (int i = 0; i < 8; i++) {\n            for (int j = 0; j < 8; j++) {\n                if (canPlay(board, player, i, j)) {\n                    result.add(new Point(i, j));\n                }\n            }\n        }\n        return result;\n    }\n\n    public static ArrayList<Point> getReversePoints(int[][] board, int player, int i, int j) {\n\n        ArrayList<Point> allReversePoints = new ArrayList<>();\n\n        int mi, mj, c;\n        int oplayer = ((player == 1) ? 2 : 1);\n\n        //move up\n        ArrayList<Point> mupts = new ArrayList<>();\n        mi = i - 1;\n        mj = j;\n        while (mi > 0 && board[mi][mj] == oplayer) {\n            mupts.add(new Point(mi, mj));\n            mi--;\n        }\n        if (mi >= 0 && board[mi][mj] == player && mupts.size() > 0) {\n            allReversePoints.addAll(mupts);\n        }\n\n\n        //move down\n        ArrayList<Point> mdpts = new ArrayList<>();\n        mi = i + 1;\n        mj = j;\n        while (mi < 7 && board[mi][mj] == oplayer) {\n            mdpts.add(new Point(mi, mj));\n            mi++;\n        }\n        if (mi <= 7 && board[mi][mj] == player && mdpts.size() > 0) {\n            allReversePoints.addAll(mdpts);\n        }\n\n        //move left\n        ArrayList<Point> mlpts = new ArrayList<>();\n        mi = i;\n        mj = j - 1;\n        while (mj > 0 && board[mi][mj] == oplayer) {\n            mlpts.add(new Point(mi, mj));\n            mj--;\n        }\n        if (mj >= 0 && board[mi][mj] == player && mlpts.size() > 0) {\n            allReversePoints.addAll(mlpts);\n        }\n\n        //move right\n        ArrayList<Point> mrpts = new ArrayList<>();\n        mi = i;\n        mj = j + 1;\n        while (mj < 7 && board[mi][mj] == oplayer) {\n            mrpts.add(new Point(mi, mj));\n            mj++;\n        }\n        if (mj <= 7 && board[mi][mj] == player && mrpts.size() > 0) {\n            allReversePoints.addAll(mrpts);\n        }\n\n        //move up left\n        ArrayList<Point> mulpts = new ArrayList<>();\n        mi = i - 1;\n        mj = j - 1;\n        while (mi > 0 && mj > 0 && board[mi][mj] == oplayer) {\n            mulpts.add(new Point(mi, mj));\n            mi--;\n            mj--;\n        }\n        if (mi >= 0 && mj >= 0 && board[mi][mj] == player && mulpts.size() > 0) {\n            allReversePoints.addAll(mulpts);\n        }\n\n        //move up right\n        ArrayList<Point> murpts = new ArrayList<>();\n        mi = i - 1;\n        mj = j + 1;\n        while (mi > 0 && mj < 7 && board[mi][mj] == oplayer) {\n            murpts.add(new Point(mi, mj));\n            mi--;\n            mj++;\n        }\n        if (mi >= 0 && mj <= 7 && board[mi][mj] == player && murpts.size() > 0) {\n            allReversePoints.addAll(murpts);\n        }\n\n        //move down left\n        ArrayList<Point> mdlpts = new ArrayList<>();\n        mi = i + 1;\n        mj = j - 1;\n        while (mi < 7 && mj > 0 && board[mi][mj] == oplayer) {\n            mdlpts.add(new Point(mi, mj));\n            mi++;\n            mj--;\n        }\n        if (mi <= 7 && mj >= 0 && board[mi][mj] == player && mdlpts.size() > 0) {\n            allReversePoints.addAll(mdlpts);\n        }\n\n        //move down right\n        ArrayList<Point> mdrpts = new ArrayList<>();\n        mi = i + 1;\n        mj = j + 1;\n        while (mi < 7 && mj < 7 && board[mi][mj] == oplayer) {\n            mdrpts.add(new Point(mi, mj));\n            mi++;\n            mj++;\n        }\n        if (mi <= 7 && mj <= 7 && board[mi][mj] == player && mdrpts.size() > 0) {\n            allReversePoints.addAll(mdrpts);\n        }\n\n        return allReversePoints;\n    }\n\n    public static boolean canPlay(int[][] board, int player, int i, int j) {\n\n        if (board[i][j] != 0) return false;\n\n        int mi, mj, c;\n        int oPlayer = ((player == 1) ? 2 : 1);\n\n        //move up\n        mi = i - 1;\n        mj = j;\n        c = 0;\n        while (mi > 0 && board[mi][mj] == oPlayer) {\n            mi--;\n            c++;\n        }\n        if (mi >= 0 && board[mi][mj] == player && c > 0) return true;\n\n\n        //move down\n        mi = i + 1;\n        mj = j;\n        c = 0;\n        while (mi < 7 && board[mi][mj] == oPlayer) {\n            mi++;\n            c++;\n        }\n        if (mi <= 7 && board[mi][mj] == player && c > 0) return true;\n\n        //move left\n        mi = i;\n        mj = j - 1;\n        c = 0;\n        while (mj > 0 && board[mi][mj] == oPlayer) {\n            mj--;\n            c++;\n        }\n        if (mj >= 0 && board[mi][mj] == player && c > 0) return true;\n\n        //move right\n        mi = i;\n        mj = j + 1;\n        c = 0;\n        while (mj < 7 && board[mi][mj] == oPlayer) {\n            mj++;\n            c++;\n        }\n        if (mj <= 7 && board[mi][mj] == player && c > 0) return true;\n\n        //move up left\n        mi = i - 1;\n        mj = j - 1;\n        c = 0;\n        while (mi > 0 && mj > 0 && board[mi][mj] == oPlayer) {\n            mi--;\n            mj--;\n            c++;\n        }\n        if (mi >= 0 && mj >= 0 && board[mi][mj] == player && c > 0) return true;\n\n        //move up right\n        mi = i - 1;\n        mj = j + 1;\n        c = 0;\n        while (mi > 0 && mj < 7 && board[mi][mj] == oPlayer) {\n            mi--;\n            mj++;\n            c++;\n        }\n        if (mi >= 0 && mj <= 7 && board[mi][mj] == player && c > 0) return true;\n\n        //move down left\n        mi = i + 1;\n        mj = j - 1;\n        c = 0;\n        while (mi < 7 && mj > 0 && board[mi][mj] == oPlayer) {\n            mi++;\n            mj--;\n            c++;\n        }\n        if (mi <= 7 && mj >= 0 && board[mi][mj] == player && c > 0) return true;\n\n        //move down right\n        mi = i + 1;\n        mj = j + 1;\n        c = 0;\n        while (mi < 7 && mj < 7 && board[mi][mj] == oPlayer) {\n            mi++;\n            mj++;\n            c++;\n        }\n        return mi <= 7 && mj <= 7 && board[mi][mj] == player && c > 0;\n\n        //when all hopes fade away\n    }\n\n    public static int[][] getNewBoardAfterMove(int[][] board, Point move, int player) {\n        //get clone of old board\n        int[][] newBoard = new int[8][8];\n        for (int k = 0; k < 8; k++) {\n            System.arraycopy(board[k], 0, newBoard[k], 0, 8);\n        }\n\n        //place piece\n        newBoard[move.x][move.y] = player;\n        //reverse pieces\n        ArrayList<Point> rev = BoardHelper.getReversePoints(newBoard, player, move.x, move.y);\n        for (Point pt : rev) {\n            newBoard[pt.x][pt.y] = player;\n        }\n\n        return newBoard;\n    }\n\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/game/BoardHelper.java b/src/game/BoardHelper.java
+--- a/src/game/BoardHelper.java	(revision e7d7713921d070a9739c17467b178411463b7c48)
++++ b/src/game/BoardHelper.java	(date 1680896409587)
+@@ -6,7 +6,7 @@
+ public class BoardHelper {
+ 
+     public static boolean isGameFinished(int[][] board) {
+-        return !(hasAnyMoves(board, 1) || hasAnyMoves(board, 2));
++        return (noMovesAvailable());
+     }
+ 
+ 
+@@ -43,226 +43,83 @@
+     }
+ 
+ 
+-    public static boolean hasAnyMoves(int[][] board, int player) {
+-        return getAllPossibleMoves(board, player).size() > 0;
++    public Square getSquare(Position position) {
++        return this.squares[position.getRow()][position.getCol()];
+     }
+-
+-    public static ArrayList<Point> getAllPossibleMoves(int[][] board, int player) {
+-        ArrayList<Point> result = new ArrayList<>();
+-        for (int i = 0; i < 8; i++) {
+-            for (int j = 0; j < 8; j++) {
+-                if (canPlay(board, player, i, j)) {
+-                    result.add(new Point(i, j));
+-                }
+-            }
+-        }
+-        return result;
+-    }
+-
+-    public static ArrayList<Point> getReversePoints(int[][] board, int player, int i, int j) {
+-
+-        ArrayList<Point> allReversePoints = new ArrayList<>();
+ 
+-        int mi, mj, c;
+-        int oplayer = ((player == 1) ? 2 : 1);
+-
+-        //move up
+-        ArrayList<Point> mupts = new ArrayList<>();
+-        mi = i - 1;
+-        mj = j;
+-        while (mi > 0 && board[mi][mj] == oplayer) {
+-            mupts.add(new Point(mi, mj));
+-            mi--;
+-        }
+-        if (mi >= 0 && board[mi][mj] == player && mupts.size() > 0) {
+-            allReversePoints.addAll(mupts);
++    /**
++     * Is this a legal move?
++     * @param player Player asking
++     * @param positionToCheck Position of the move being checked
++     * @return True if this space is a legal move
++     */
++    public boolean isLegalMove(Player player, Position positionToCheck) {
++        // If the space isn't empty, it's not a legal move
++        if (getSquare(positionToCheck).getStatus() != Constants.EMPTY)
++            return false;
++        // Check all directions to see if the move is legal
++        for (String direction : Directions.getDirections()) {
++            Position directionVector = Directions.getVector(direction);
++            if (step(player, positionToCheck, directionVector, 0)) {
++                return true;
++            }
+         }
+-
+-
+-        //move down
+-        ArrayList<Point> mdpts = new ArrayList<>();
+-        mi = i + 1;
+-        mj = j;
+-        while (mi < 7 && board[mi][mj] == oplayer) {
+-            mdpts.add(new Point(mi, mj));
+-            mi++;
+-        }
+-        if (mi <= 7 && board[mi][mj] == player && mdpts.size() > 0) {
+-            allReversePoints.addAll(mdpts);
+-        }
++        return false;
++    }
+ 
+-        //move left
+-        ArrayList<Point> mlpts = new ArrayList<>();
+-        mi = i;
+-        mj = j - 1;
+-        while (mj > 0 && board[mi][mj] == oplayer) {
+-            mlpts.add(new Point(mi, mj));
+-            mj--;
+-        }
+-        if (mj >= 0 && board[mi][mj] == player && mlpts.size() > 0) {
+-            allReversePoints.addAll(mlpts);
+-        }
+-
+-        //move right
+-        ArrayList<Point> mrpts = new ArrayList<>();
+-        mi = i;
+-        mj = j + 1;
+-        while (mj < 7 && board[mi][mj] == oplayer) {
+-            mrpts.add(new Point(mi, mj));
+-            mj++;
++    /**
++     * Are there any available for this player?
++     * @param player Player asking
++     * @return True if moves are available
++     */
++    public boolean noMovesAvailable(Player player) {
++        for (int row = 0; row < Constants.SIZE; row++) {
++            for (int col = 0; col < Constants.SIZE; col++) {
++                Position pos = new Position(row, col);
++                if (isLegalMove(player, pos)) {
++                    return false;
++                }
++            }
+         }
+-        if (mj <= 7 && board[mi][mj] == player && mrpts.size() > 0) {
+-            allReversePoints.addAll(mrpts);
+-        }
++        return true;
++    }
+ 
+-        //move up left
+-        ArrayList<Point> mulpts = new ArrayList<>();
+-        mi = i - 1;
+-        mj = j - 1;
+-        while (mi > 0 && mj > 0 && board[mi][mj] == oplayer) {
+-            mulpts.add(new Point(mi, mj));
+-            mi--;
+-            mj--;
++    /**
++     * Traverses the board in the provided direction. Checks the status of
++     * each space:
++     * a. If it's the opposing player then we'll move to the next
++     *    space to see if there's a blank space
++     * b. If it's the same player then this direction doesn't represent
++     *    a legal move
++     * c. If it's a blank AND if it's not the adjacent square then this
++     *    direction is a legal move. Otherwise, it's not.
++     *
++     * @param player  Player making the request
++     * @param position Position being checked
++     * @param direction Direction to move
++     * @param count Number of steps we've made so far
++     * @return True if we find a legal move
++     */
++    protected boolean step(Player player, Position position, Position direction, int count) {
++        Position newPosition = position.translate(direction);
++        int color = player.getColor();
++        if (newPosition.isOffBoard()) {
++            // If off the board then move is not legal
++            return false;
++        } else if ((this.getSquare(newPosition).getStatus() == Constants.EMPTY) && (count == 0)) {
++            // If empty space AND adjacent to position then not legal
++            return false;
++        } else if (!player.isThisPlayer(this.getSquare(newPosition).getStatus()) && this.getSquare(newPosition).getStatus() != Constants.EMPTY) {
++            // If space has opposing player then move to next space in same direction
++            return step(player, newPosition, direction, count+1);
++        } else if (player.isThisPlayer(this.getSquare(newPosition).getStatus())) {
++            // If space has this player and we've moved more than one space, then it's legal,
++            // otherwise it's not legal
++            return count > 0;
++        } else {
++            // Didn't pass any other test, not legal move
++            return false;
+         }
+-        if (mi >= 0 && mj >= 0 && board[mi][mj] == player && mulpts.size() > 0) {
+-            allReversePoints.addAll(mulpts);
+-        }
+-
+-        //move up right
+-        ArrayList<Point> murpts = new ArrayList<>();
+-        mi = i - 1;
+-        mj = j + 1;
+-        while (mi > 0 && mj < 7 && board[mi][mj] == oplayer) {
+-            murpts.add(new Point(mi, mj));
+-            mi--;
+-            mj++;
+-        }
+-        if (mi >= 0 && mj <= 7 && board[mi][mj] == player && murpts.size() > 0) {
+-            allReversePoints.addAll(murpts);
+-        }
+-
+-        //move down left
+-        ArrayList<Point> mdlpts = new ArrayList<>();
+-        mi = i + 1;
+-        mj = j - 1;
+-        while (mi < 7 && mj > 0 && board[mi][mj] == oplayer) {
+-            mdlpts.add(new Point(mi, mj));
+-            mi++;
+-            mj--;
+-        }
+-        if (mi <= 7 && mj >= 0 && board[mi][mj] == player && mdlpts.size() > 0) {
+-            allReversePoints.addAll(mdlpts);
+-        }
+-
+-        //move down right
+-        ArrayList<Point> mdrpts = new ArrayList<>();
+-        mi = i + 1;
+-        mj = j + 1;
+-        while (mi < 7 && mj < 7 && board[mi][mj] == oplayer) {
+-            mdrpts.add(new Point(mi, mj));
+-            mi++;
+-            mj++;
+-        }
+-        if (mi <= 7 && mj <= 7 && board[mi][mj] == player && mdrpts.size() > 0) {
+-            allReversePoints.addAll(mdrpts);
+-        }
+-
+-        return allReversePoints;
+-    }
+-
+-    public static boolean canPlay(int[][] board, int player, int i, int j) {
+-
+-        if (board[i][j] != 0) return false;
+-
+-        int mi, mj, c;
+-        int oPlayer = ((player == 1) ? 2 : 1);
+-
+-        //move up
+-        mi = i - 1;
+-        mj = j;
+-        c = 0;
+-        while (mi > 0 && board[mi][mj] == oPlayer) {
+-            mi--;
+-            c++;
+-        }
+-        if (mi >= 0 && board[mi][mj] == player && c > 0) return true;
+-
+-
+-        //move down
+-        mi = i + 1;
+-        mj = j;
+-        c = 0;
+-        while (mi < 7 && board[mi][mj] == oPlayer) {
+-            mi++;
+-            c++;
+-        }
+-        if (mi <= 7 && board[mi][mj] == player && c > 0) return true;
+-
+-        //move left
+-        mi = i;
+-        mj = j - 1;
+-        c = 0;
+-        while (mj > 0 && board[mi][mj] == oPlayer) {
+-            mj--;
+-            c++;
+-        }
+-        if (mj >= 0 && board[mi][mj] == player && c > 0) return true;
+-
+-        //move right
+-        mi = i;
+-        mj = j + 1;
+-        c = 0;
+-        while (mj < 7 && board[mi][mj] == oPlayer) {
+-            mj++;
+-            c++;
+-        }
+-        if (mj <= 7 && board[mi][mj] == player && c > 0) return true;
+-
+-        //move up left
+-        mi = i - 1;
+-        mj = j - 1;
+-        c = 0;
+-        while (mi > 0 && mj > 0 && board[mi][mj] == oPlayer) {
+-            mi--;
+-            mj--;
+-            c++;
+-        }
+-        if (mi >= 0 && mj >= 0 && board[mi][mj] == player && c > 0) return true;
+-
+-        //move up right
+-        mi = i - 1;
+-        mj = j + 1;
+-        c = 0;
+-        while (mi > 0 && mj < 7 && board[mi][mj] == oPlayer) {
+-            mi--;
+-            mj++;
+-            c++;
+-        }
+-        if (mi >= 0 && mj <= 7 && board[mi][mj] == player && c > 0) return true;
+-
+-        //move down left
+-        mi = i + 1;
+-        mj = j - 1;
+-        c = 0;
+-        while (mi < 7 && mj > 0 && board[mi][mj] == oPlayer) {
+-            mi++;
+-            mj--;
+-            c++;
+-        }
+-        if (mi <= 7 && mj >= 0 && board[mi][mj] == player && c > 0) return true;
+-
+-        //move down right
+-        mi = i + 1;
+-        mj = j + 1;
+-        c = 0;
+-        while (mi < 7 && mj < 7 && board[mi][mj] == oPlayer) {
+-            mi++;
+-            mj++;
+-            c++;
+-        }
+-        return mi <= 7 && mj <= 7 && board[mi][mj] == player && c > 0;
+-
+-        //when all hopes fade away
+     }
+ 
+     public static int[][] getNewBoardAfterMove(int[][] board, Point move, int player) {
+Index: src/game/GamePanel.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package game;\n\nimport com.mrjaffesclass.apcs.messenger.MessageHandler;\nimport com.mrjaffesclass.apcs.messenger.Messenger;\n\nimport javax.swing.*;\nimport java.awt.*;\nimport java.awt.event.ActionEvent;\nimport java.util.Arrays;\n\npublic class GamePanel extends JPanel implements GameEngine, MessageHandler {\n\n    //reversi board\n    int[][] board;\n\n    //player turn\n    //black plays first\n    int turn = 1;\n\n    //swing elements\n    BoardCell[][] cells;\n    JLabel score1;\n    JLabel score2;\n\n    int totalscore1 = 0;\n    int totalscore2 = 0;\n\n    JLabel tscore1;\n    JLabel tscore2;\n\n\n    GamePlayer player1 = new HumanPlayer(1);\n    GamePlayer player2 = new HumanPlayer(2);\n\n    Timer player1HandlerTimer;\n    Timer player2HandlerTimer;\n    private final Messenger mvcMessaging;\n\n    @Override\n    public int getBoardValue(int i,int j){\n        return board[i][j];\n    }\n\n    @Override\n    public void setBoardValue(int i,int j,int value){\n        board[i][j] = value;\n    }\n\n    public GamePanel(Messenger messages){\n\n        mvcMessaging = messages;\n\n        this.setBackground(Color.WHITE);\n        this.setLayout(new BorderLayout());\n\n        JPanel reversiBoard = new JPanel();\n        reversiBoard.setLayout(new GridLayout(8,8));\n        reversiBoard.setPreferredSize(new Dimension(500,500));\n        reversiBoard.setBackground(new Color(41,100, 59));\n\n        //init board\n        resetBoard();\n\n        cells = new BoardCell[8][8];\n        for (int i = 0; i < 8; i++) {\n            for (int j = 0; j < 8; j++) {\n                cells[i][j] = new BoardCell(this,reversiBoard,i,j);\n                reversiBoard.add(cells[i][j]);\n            }\n        }\n\n\n        JPanel sidebar = new JPanel();\n        sidebar.setLayout(new BoxLayout(sidebar,BoxLayout.Y_AXIS));\n        sidebar.setPreferredSize(new Dimension(200,0));\n\n        score1 = new JLabel(\"Score 1\");\n        score2 = new JLabel(\"Score 2\");\n\n        tscore1 = new JLabel(\"Total Score 1\");\n        tscore2 = new JLabel(\"Total Score 2\");\n\n        sidebar.add(score1);\n        sidebar.add(score2);\n\n        sidebar.add(new JLabel(\"-----------\"));\n\n        sidebar.add(tscore1);\n        sidebar.add(tscore2);\n\n\n        this.add(sidebar,BorderLayout.WEST);\n        this.add(reversiBoard);\n\n        mvcMessaging.subscribe(\"view:buttonClicked\", this);\n        mvcMessaging.subscribe(\"view:boardUpdate\", this);\n        mvcMessaging.subscribe(\"move:player\", this);\n        mvcMessaging.subscribe(\"game:finished\", this);\n\n        //\n        updateBoardInfo();\n        updateTotalScore();\n\n        //AI Handler Timer (to unfreeze gui)\n        player1HandlerTimer = new Timer(1000,(ActionEvent e) -> {\n            handlePlayer(player1);\n            player1HandlerTimer.stop();\n            manageTurn();\n        });\n\n        player2HandlerTimer = new Timer(1000,(ActionEvent e) -> {\n            handlePlayer(player2);\n            player2HandlerTimer.stop();\n            manageTurn();\n        });\n\n        manageTurn();\n    }\n\n    private boolean awaitForClick = false;\n\n    public void manageTurn(){\n        if(BoardHelper.hasAnyMoves(board,1) || BoardHelper.hasAnyMoves(board,2)) {\n            updateBoardInfo();\n            if (turn == 1) {\n                if(BoardHelper.hasAnyMoves(board,1)) {\n                    if (player1.isUserPlayer()) {\n                        awaitForClick = true;\n                        //after click this function should be call backed\n                    } else {\n                        player1HandlerTimer.start();\n                    }\n                }else{\n                    //forfeit this move and pass the turn\n                    mvcMessaging.notify(\"move:player\", \"Player 1 has no legal moves !\");\n                    turn = 2;\n                    manageTurn();\n                }\n            } else {\n                if(BoardHelper.hasAnyMoves(board,2)) {\n                    if (player2.isUserPlayer()) {\n                        awaitForClick = true;\n                        //after click this function should be call backed\n                    } else {\n                        player2HandlerTimer.start();\n                    }\n                }else{\n                    //forfeit this move and pass the turn\n                    mvcMessaging.notify(\"move:player\", \"Player 2 has no legal moves !\");\n                    turn = 1;\n                    manageTurn();\n                }\n            }\n        }else{\n            //game finished\n            mvcMessaging.notify(\"game:finished\", \"Game Finished !\");\n            int winner = BoardHelper.getWinner(board);\n            if(winner==1) totalscore1++;\n            else if(winner==2) totalscore2++;\n            updateTotalScore();\n            //restart\n            //resetBoard();\n            //turn=1;\n            //manageTurn();\n        }\n    }\n\n    public void resetBoard(){\n        board = new int[8][8];\n        for (int i = 0; i < 8; i++) {\n            Arrays.fill(board[i], 0);\n        }\n        //initial board state\n        setBoardValue(3,3,2);\n        setBoardValue(3,4,1);\n        setBoardValue(4,3,1);\n        setBoardValue(4,4,2);\n    }\n\n    //update highlights on possible moves and scores\n    public void updateBoardInfo(){\n\n        int p1score = 0;\n        int p2score = 0;\n\n        for (int i = 0; i < 8; i++) {\n            for (int j = 0; j < 8; j++) {\n                if(board[i][j] == 1) p1score++;\n                if(board[i][j] == 2) p2score++;\n\n                if(BoardHelper.canPlay(board,turn,i,j)){\n                    cells[i][j].highlight = 1;\n                }else{\n                    cells[i][j].highlight = 0;\n                }\n            }\n        }\n\n        score1.setText(player1.playerName() + \" : \" + p1score);\n        score2.setText(player2.playerName() + \" : \" + p2score);\n        mvcMessaging.notify(\"view:boardUpdate\", \"Board Updated\");\n\n    }\n\n    public void updateTotalScore(){\n        tscore1.setText(player1.playerName() + \" : \" + totalscore1);\n        tscore2.setText(player2.playerName() + \" : \" + totalscore2);\n    }\n\n    @Override\n    public void handleClick(int i, int j){\n        if(awaitForClick && BoardHelper.canPlay(board,turn,i,j)){\n            mvcMessaging.notify(\"move:player\",\n                    (turn == 1) ?\n                            (\"Player 1 \") + \"Made Move : \"+ i + \" , \" + j :\n                            (\"Player 2 \") + \"Made Move : \"+ i + \" , \" + j);\n\n            mvcMessaging.notify(\"view:buttonClicked\",\n                    (turn == 1) ?\n                    (\"Player 1 \") + \"Placed Piece : \"+ i + \" , \" + j :\n                    (\"Player 2 \") + \"Placed Piece : \"+ i + \" , \" + j);\n\n            //update board\n            board = BoardHelper.getNewBoardAfterMove(board,new Point(i,j),turn);\n\n            //advance turn\n            turn = (turn == 1) ? 2 : 1;\n\n            repaint();\n\n            awaitForClick = false;\n\n            //callback\n            manageTurn();\n        }\n    }\n\n    private MessagePayload createPayload(int fieldNumber, int direction) {\n        return new MessagePayload(fieldNumber, direction);\n    }\n\n    public void handlePlayer(GamePlayer gamePlayer){\n        Point playerPlayPoint = gamePlayer.play(board);\n        int i = playerPlayPoint.x;\n        int j = playerPlayPoint.y;\n        if(!BoardHelper.canPlay(board,gamePlayer.myMark,i,j)) {\n            mvcMessaging.notify(\"move:player\", \"Player Played in Invalid Move : \" + i + \" , \" + j);\n        }\n\n        //update board\n        board = BoardHelper.getNewBoardAfterMove(board,playerPlayPoint,turn);\n\n        //advance turn\n        turn = (turn == 1) ? 2 : 1;\n\n        repaint();\n    }\n\n    @Override\n    public void messageHandler(String message, Object messagePayload) {\n        // Remove the substring of \"move:\" or otherwise from the message\n        String messageName = message.substring(message.indexOf(\":\")+1);\n        String messageData = message.substring(0, message.indexOf(\":\"));\n\n        if (messagePayload != null) {\n            System.out.printf(\"MSG: received by %s: \"+messageName+\" | \"+messagePayload+\"\\n\", messageData);\n        } else {\n            System.out.printf(\"MSG: received by %s: \"+messageName+\" | No data sent\", messageData);\n        }\n        assert messagePayload != null;\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/game/GamePanel.java b/src/game/GamePanel.java
+--- a/src/game/GamePanel.java	(revision e7d7713921d070a9739c17467b178411463b7c48)
++++ b/src/game/GamePanel.java	(date 1680895685206)
+@@ -29,8 +29,8 @@
+     JLabel tscore2;
+ 
+ 
+-    GamePlayer player1 = new HumanPlayer(1);
+-    GamePlayer player2 = new HumanPlayer(2);
++    Player player1 = new Player(1);
++    Player player2 = new Player(2);
+ 
+     Timer player1HandlerTimer;
+     Timer player2HandlerTimer;
+@@ -120,7 +120,7 @@
+     private boolean awaitForClick = false;
+ 
+     public void manageTurn(){
+-        if(BoardHelper.hasAnyMoves(board,1) || BoardHelper.hasAnyMoves(board,2)) {
++        if(BoardHelper.openSpaces(board,1) || BoardHelper.openSpaces(board,2)) {
+             updateBoardInfo();
+             if (turn == 1) {
+                 if(BoardHelper.hasAnyMoves(board,1)) {
+@@ -178,19 +178,19 @@
+     }
+ 
+     //update highlights on possible moves and scores
+-    public void updateBoardInfo(){
++    public void updateBoardInfo() {
+ 
+         int p1score = 0;
+         int p2score = 0;
+ 
+         for (int i = 0; i < 8; i++) {
+             for (int j = 0; j < 8; j++) {
+-                if(board[i][j] == 1) p1score++;
+-                if(board[i][j] == 2) p2score++;
++                if (board[i][j] == 1) p1score++;
++                if (board[i][j] == 2) p2score++;
+ 
+-                if(BoardHelper.canPlay(board,turn,i,j)){
++                if (BoardHelper.canPlay(board, turn, i, j)) {
+                     cells[i][j].highlight = 1;
+-                }else{
++                } else {
+                     cells[i][j].highlight = 0;
+                 }
+             }
+@@ -203,8 +203,10 @@
+     }
+ 
+     public void updateTotalScore(){
+-        tscore1.setText(player1.playerName() + " : " + totalscore1);
+-        tscore2.setText(player2.playerName() + " : " + totalscore2);
++        tscore1.setText("Player 1: Black = " + totalscore1 +
++                ((totalscore1 > totalscore2) ? " (Winning)" : " (Losing)"));
++        tscore2.setText("Player 2: White = " + totalscore2 +
++                ((totalscore2 > totalscore1) ? " (Winning)" : " (Losing)"));
+     }
+ 
+     @Override
+@@ -235,15 +237,11 @@
+         }
+     }
+ 
+-    private MessagePayload createPayload(int fieldNumber, int direction) {
+-        return new MessagePayload(fieldNumber, direction);
+-    }
+-
+-    public void handlePlayer(GamePlayer gamePlayer){
++    public void handlePlayer(Player gamePlayer) {
+         Point playerPlayPoint = gamePlayer.play(board);
+         int i = playerPlayPoint.x;
+         int j = playerPlayPoint.y;
+-        if(!BoardHelper.canPlay(board,gamePlayer.myMark,i,j)) {
++        if(!BoardHelper.canPlay(board,gamePlayer.color,i,j)) {
+             mvcMessaging.notify("move:player", "Player Played in Invalid Move : " + i + " , " + j);
+         }
+ 
+Index: src/game/BoardPrinter.java
+===================================================================
+diff --git a/src/game/BoardPrinter.java b/src/game/BoardPrinter.java
+deleted file mode 100644
+--- a/src/game/BoardPrinter.java	(revision e7d7713921d070a9739c17467b178411463b7c48)
++++ /dev/null	(revision e7d7713921d070a9739c17467b178411463b7c48)
+@@ -1,61 +0,0 @@
+-package game;
+-
+-import javax.swing.*;
+-import java.awt.*;
+-
+-public class BoardPrinter extends JFrame implements GameEngine {
+-
+-    public BoardCell[][] cells;
+-    int[][] board;
+-
+-    public BoardPrinter(int[][] board,String title){
+-
+-        this.board = board;
+-
+-        JPanel reversiBoard = new JPanel();
+-        reversiBoard.setLayout(new GridLayout(8,8));
+-        reversiBoard.setPreferredSize(new Dimension(250,250));
+-        reversiBoard.setBackground(new Color(41,100, 59));
+-
+-        //init board
+-        //resetBoard();
+-
+-        cells = new BoardCell[8][8];
+-        for (int i = 0; i < 8; i++) {
+-            for (int j = 0; j < 8; j++) {
+-                cells[i][j] = new BoardCell(this,reversiBoard,i,j);
+-                reversiBoard.add(cells[i][j]);
+-            }
+-        }
+-
+-        this.add(reversiBoard);
+-        this.setTitle(title);
+-        //this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+-        this.pack();
+-        this.setVisible(true);
+-
+-        reversiBoard.repaint();
+-        //this.setSize(500,500);
+-
+-    }
+-
+-    public void showForm(){
+-
+-    }
+-
+-
+-    @Override
+-    public int getBoardValue(int i, int j) {
+-        return board[i][j];
+-    }
+-
+-    @Override
+-    public void setBoardValue(int i, int j, int value) {
+-        System.err.println("Printer cant edit !");
+-    }
+-
+-    @Override
+-    public void handleClick(int i, int j) {
+-        //do nothing
+-    }
+-}
+Index: src/game/GameEngine.java
+===================================================================
+diff --git a/src/game/GameEngine.java b/src/game/GameEngine.java
+deleted file mode 100644
+--- a/src/game/GameEngine.java	(revision e7d7713921d070a9739c17467b178411463b7c48)
++++ /dev/null	(revision e7d7713921d070a9739c17467b178411463b7c48)
+@@ -1,12 +0,0 @@
+-package game;
+-
+-//interface that gui speaks to
+-public interface GameEngine {
+-
+-    int getBoardValue(int i,int j);
+-
+-    void setBoardValue(int i,int j,int value);
+-
+-    void handleClick(int i,int j);
+-
+-}
+Index: src/game/Position.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/game/Position.java b/src/game/Position.java
+new file mode 100644
+--- /dev/null	(date 1680896326067)
++++ b/src/game/Position.java	(date 1680896326067)
+@@ -0,0 +1,40 @@
++package game;
++
++import java.awt.*;
++
++/*
++ * Copyright 2017 Roger J
++
++package game;
++import java.awt.Point;
++
++ */
++public class Position extends Point {
++
++    public Position(int row, int col) {
++        super (row, col);
++    }
++
++    public int getRow() {
++        return this.x;
++    }
++
++    public int getCol() {
++        return this.y;
++    }
++
++    public Position translate(Position vector) {
++        return new Position(this.x+vector.x, this.y+vector.y);
++    }
++
++    public boolean isOffBoard() {
++        return (this.x < 0 || this.x >= 8 ||
++                this.y < 0 || this.y >= 8);
++    }
++
++    @Override
++    public String toString() {
++        return "["+this.getRow()+","+this.getCol()+"]";
++    }
++
++}
+\ No newline at end of file
+Index: src/game/Square.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/game/Square.java b/src/game/Square.java
+new file mode 100644
+--- /dev/null	(date 1680896429312)
++++ b/src/game/Square.java	(date 1680896429312)
+@@ -0,0 +1,48 @@
++package game;
++
++/**
++ * Represents a square on the checkerboard
++ *
++ * @author Mr. Jaffe
++ * @version 1.0
++ */
++public final class Square
++{
++    // -1 Black, 1 White, 0 Blank
++    private int status;
++
++    /**
++     * Constructor for objects of class Square
++     * @param status Initial status of the square. One of RED, BLACK, EMPTY
++     */
++    public Square(int status)
++    {
++        this.setStatus(status);
++    }
++
++    /**
++     * Get current status
++     * @return Current status
++     */
++    public int getStatus() {
++        return status;
++    }
++
++    /**
++     * Set new status
++     * @param status New status
++     */
++    public void setStatus(int status) {
++        this.status = status;
++    }
++
++    @Override
++    public String toString() {
++        switch (status) {
++            case Constants.WHITE: return " W ";
++            case Constants.BLACK: return " B ";
++        }
++        return "   ";
++    }
++
++}
+\ No newline at end of file
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AnalysisUIOptions\">\n    <option name=\"ANALYZE_INJECTED_CODE\" value=\"false\" />\n  </component>\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"5ccee63e-a0fa-4840-b8fb-e97bb953fea3\" name=\"Default\" comment=\"rewrite MVC notifying String and payload\" />\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"FileEditorManager\">\n    <leaf SIDE_TABS_SIZE_LIMIT_KEY=\"300\">\n      <file leaf-file-name=\"OpeningBook.java\" pinned=\"false\" current-in-tab=\"false\">\n        <entry file=\"file://$PROJECT_DIR$/src/player/ai/OpeningBook.java\">\n          <provider selected=\"true\" editor-type-id=\"text-editor\">\n            <state relative-caret-position=\"2100\">\n              <caret line=\"142\" column=\"0\" lean-forward=\"false\" selection-start-line=\"6\" selection-start-column=\"0\" selection-end-line=\"142\" selection-end-column=\"0\" />\n              <folding>\n                <element signature=\"imports\" expanded=\"true\" />\n              </folding>\n            </state>\n          </provider>\n        </entry>\n      </file>\n      <file leaf-file-name=\"Evaluator.java\" pinned=\"false\" current-in-tab=\"false\">\n        <entry file=\"file://$PROJECT_DIR$/src/player/ai/Evaluator.java\">\n          <provider selected=\"true\" editor-type-id=\"text-editor\">\n            <state relative-caret-position=\"30\">\n              <caret line=\"2\" column=\"7\" lean-forward=\"false\" selection-start-line=\"2\" selection-start-column=\"7\" selection-end-line=\"7\" selection-end-column=\"0\" />\n              <folding />\n            </state>\n          </provider>\n        </entry>\n      </file>\n      <file leaf-file-name=\"RealtimeEvaluator.java\" pinned=\"false\" current-in-tab=\"false\">\n        <entry file=\"file://$PROJECT_DIR$/src/player/ai/RealtimeEvaluator.java\">\n          <provider selected=\"true\" editor-type-id=\"text-editor\">\n            <state relative-caret-position=\"2220\">\n              <caret line=\"153\" column=\"0\" lean-forward=\"false\" selection-start-line=\"9\" selection-start-column=\"7\" selection-end-line=\"157\" selection-end-column=\"1\" />\n              <folding>\n                <element signature=\"imports\" expanded=\"true\" />\n              </folding>\n            </state>\n          </provider>\n        </entry>\n      </file>\n      <file leaf-file-name=\"AIPlayerRealtimeKiller.java\" pinned=\"false\" current-in-tab=\"false\">\n        <entry file=\"file://$PROJECT_DIR$/src/player/ai/AIPlayerRealtimeKiller.java\">\n          <provider selected=\"true\" editor-type-id=\"text-editor\">\n            <state relative-caret-position=\"765\">\n              <caret line=\"55\" column=\"39\" lean-forward=\"false\" selection-start-line=\"55\" selection-start-column=\"39\" selection-end-line=\"55\" selection-end-column=\"39\" />\n              <folding>\n                <element signature=\"imports\" expanded=\"true\" />\n              </folding>\n            </state>\n          </provider>\n        </entry>\n      </file>\n      <file leaf-file-name=\"DynamicEvaluator.java\" pinned=\"false\" current-in-tab=\"false\">\n        <entry file=\"file://$PROJECT_DIR$/src/player/ai/DynamicEvaluator.java\">\n          <provider selected=\"true\" editor-type-id=\"text-editor\">\n            <state relative-caret-position=\"570\">\n              <caret line=\"40\" column=\"0\" lean-forward=\"false\" selection-start-line=\"40\" selection-start-column=\"0\" selection-end-line=\"40\" selection-end-column=\"0\" />\n              <folding>\n                <element signature=\"imports\" expanded=\"true\" />\n              </folding>\n            </state>\n          </provider>\n        </entry>\n      </file>\n      <file leaf-file-name=\"GamePlayer.java\" pinned=\"false\" current-in-tab=\"false\">\n        <entry file=\"file://$PROJECT_DIR$/src/game/GamePlayer.java\">\n          <provider selected=\"true\" editor-type-id=\"text-editor\">\n            <state relative-caret-position=\"60\">\n              <caret line=\"4\" column=\"0\" lean-forward=\"false\" selection-start-line=\"4\" selection-start-column=\"0\" selection-end-line=\"18\" selection-end-column=\"0\" />\n              <folding />\n            </state>\n          </provider>\n        </entry>\n      </file>\n      <file leaf-file-name=\"BoardHelper.java\" pinned=\"false\" current-in-tab=\"false\">\n        <entry file=\"file://$PROJECT_DIR$/src/game/BoardHelper.java\">\n          <provider selected=\"true\" editor-type-id=\"text-editor\">\n            <state relative-caret-position=\"8055\">\n              <caret line=\"540\" column=\"0\" lean-forward=\"false\" selection-start-line=\"5\" selection-start-column=\"0\" selection-end-line=\"540\" selection-end-column=\"0\" />\n              <folding>\n                <element signature=\"imports\" expanded=\"true\" />\n              </folding>\n            </state>\n          </provider>\n        </entry>\n      </file>\n      <file leaf-file-name=\"GameWindow.java\" pinned=\"false\" current-in-tab=\"false\">\n        <entry file=\"file://$PROJECT_DIR$/src/game/GameWindow.java\">\n          <provider selected=\"true\" editor-type-id=\"text-editor\">\n            <state relative-caret-position=\"195\">\n              <caret line=\"14\" column=\"32\" lean-forward=\"false\" selection-start-line=\"14\" selection-start-column=\"32\" selection-end-line=\"14\" selection-end-column=\"32\" />\n              <folding>\n                <element signature=\"imports\" expanded=\"true\" />\n              </folding>\n            </state>\n          </provider>\n        </entry>\n      </file>\n      <file leaf-file-name=\"Minimax.java\" pinned=\"false\" current-in-tab=\"false\">\n        <entry file=\"file://$PROJECT_DIR$/src/player/ai/Minimax.java\">\n          <provider selected=\"true\" editor-type-id=\"text-editor\">\n            <state relative-caret-position=\"1755\">\n              <caret line=\"121\" column=\"4\" lean-forward=\"false\" selection-start-line=\"121\" selection-start-column=\"4\" selection-end-line=\"121\" selection-end-column=\"4\" />\n              <folding />\n            </state>\n          </provider>\n        </entry>\n      </file>\n      <file leaf-file-name=\"GamePanel.java\" pinned=\"false\" current-in-tab=\"true\">\n        <entry file=\"file://$PROJECT_DIR$/src/game/GamePanel.java\">\n          <provider selected=\"true\" editor-type-id=\"text-editor\">\n            <state relative-caret-position=\"-1472\">\n              <caret line=\"24\" column=\"24\" lean-forward=\"true\" selection-start-line=\"24\" selection-start-column=\"24\" selection-end-line=\"24\" selection-end-column=\"24\" />\n              <folding>\n                <element signature=\"imports\" expanded=\"true\" />\n              </folding>\n            </state>\n          </provider>\n        </entry>\n      </file>\n    </leaf>\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"Class\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"GradleLocalSettings\">\n    <option name=\"externalProjectsViewState\">\n      <projects_view />\n    </option>\n  </component>\n  <component name=\"IdeDocumentHistory\">\n    <option name=\"CHANGED_PATHS\">\n      <list>\n        <option value=\"$PROJECT_DIR$/src/GameWindow.java\" />\n        <option value=\"$PROJECT_DIR$/src/BoardCell.java\" />\n        <option value=\"$PROJECT_DIR$/src/GameAI.java\" />\n        <option value=\"$PROJECT_DIR$/src/GamePanel.java\" />\n        <option value=\"$PROJECT_DIR$/src/game/GameAI.java\" />\n        <option value=\"$PROJECT_DIR$/src/game/GamePlayer.java\" />\n        <option value=\"$PROJECT_DIR$/src/player/HumanPlayer.java\" />\n        <option value=\"$PROJECT_DIR$/src/player/RandomPlayer.java\" />\n        <option value=\"$PROJECT_DIR$/src/player/GreedyPlayer.java\" />\n        <option value=\"$PROJECT_DIR$/src/game/GameGUI.java\" />\n        <option value=\"$PROJECT_DIR$/src/game/GameEngine.java\" />\n        <option value=\"$PROJECT_DIR$/src/player/ai/Evaluator.java\" />\n        <option value=\"$PROJECT_DIR$/src/game/BoardPrinter.java\" />\n        <option value=\"$PROJECT_DIR$/src/game/BoardCell.java\" />\n        <option value=\"$PROJECT_DIR$/src/player/ai/StaticEvaluator2.java\" />\n        <option value=\"$PROJECT_DIR$/src/player/ai/StaticEvaluator.java\" />\n        <option value=\"$PROJECT_DIR$/src/player/ai/ZorbistHash.java\" />\n        <option value=\"$PROJECT_DIR$/src/player/ai/TimingEvaluator.java\" />\n        <option value=\"$PROJECT_DIR$/src/player/ai/Minimax.java\" />\n        <option value=\"$PROJECT_DIR$/src/player/ai/AIPlayer2.java\" />\n        <option value=\"$PROJECT_DIR$/src/player/ai/DynamicEvaluator.java\" />\n        <option value=\"$PROJECT_DIR$/src/player/ai/RealtimeEvaluator.java\" />\n        <option value=\"$PROJECT_DIR$/src/player/ai/AIPlayer.java\" />\n        <option value=\"$PROJECT_DIR$/src/player/ai/AIPlayerStatic.java\" />\n        <option value=\"$PROJECT_DIR$/src/player/ai/AIPlayerDynamic.java\" />\n        <option value=\"$PROJECT_DIR$/src/game/GameWindow.java\" />\n        <option value=\"$PROJECT_DIR$/src/player/ai/AIPlayerRealtime.java\" />\n        <option value=\"$PROJECT_DIR$/src/game/BoardHelper.java\" />\n        <option value=\"$PROJECT_DIR$/src/player/ai/OpenningBook.java\" />\n        <option value=\"$PROJECT_DIR$/src/player/ai/OpeningBook.java\" />\n        <option value=\"$PROJECT_DIR$/src/player/ai/AIPlayerRealtimeKiller.java\" />\n        <option value=\"$PROJECT_DIR$/src/game/GamePanel.java\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"JsBuildToolGruntFileManager\" detection-done=\"true\" sorting=\"DEFINITION_ORDER\" />\n  <component name=\"JsBuildToolPackageJson\" detection-done=\"true\" sorting=\"DEFINITION_ORDER\" />\n  <component name=\"JsGulpfileManager\">\n    <detection-done>true</detection-done>\n    <sorting>DEFINITION_ORDER</sorting>\n  </component>\n  <component name=\"MarkdownSettingsMigration\">\n    <option name=\"stateVersion\" value=\"1\" />\n  </component>\n  <component name=\"ProblemsViewState\">\n    <option name=\"selectedTabId\" value=\"CurrentFile\" />\n  </component>\n  <component name=\"ProjectFrameBounds\">\n    <option name=\"y\" value=\"22\" />\n    <option name=\"width\" value=\"1440\" />\n    <option name=\"height\" value=\"809\" />\n  </component>\n  <component name=\"ProjectId\" id=\"2O1J19Za6okErorK6dGL3Y7P2tp\" />\n  <component name=\"ProjectInspectionProfilesVisibleTreeState\">\n    <entry key=\"Project Default\">\n      <profile-state>\n        <expanded-state>\n          <State>\n            <id />\n          </State>\n          <State>\n            <id>AOP</id>\n          </State>\n          <State>\n            <id>Android &gt; Lint &gt; Correctness</id>\n          </State>\n          <State>\n            <id>Android &gt; Lint &gt; Internationalization</id>\n          </State>\n          <State>\n            <id>Android &gt; Lint &gt; Performance</id>\n          </State>\n          <State>\n            <id>Android &gt; Lint &gt; Security</id>\n          </State>\n          <State>\n            <id>Android &gt; Lint &gt; Usability &gt; Icons</id>\n          </State>\n          <State>\n            <id>Android Lint for Kotlin</id>\n          </State>\n          <State>\n            <id>Ant inspections</id>\n          </State>\n          <State>\n            <id>Application Server Specific Inspections</id>\n          </State>\n          <State>\n            <id>Assignment issuesJavaScript</id>\n          </State>\n          <State>\n            <id>CSS</id>\n          </State>\n          <State>\n            <id>Code maturity issuesJava</id>\n          </State>\n          <State>\n            <id>Code style issuesCSS</id>\n          </State>\n          <State>\n            <id>Code style issuesJava</id>\n          </State>\n          <State>\n            <id>CodeSpring CoreSpring</id>\n          </State>\n          <State>\n            <id>Control FlowGroovy</id>\n          </State>\n          <State>\n            <id>Control flow issuesJava</id>\n          </State>\n          <State>\n            <id>Control flow issuesJavaScript</id>\n          </State>\n          <State>\n            <id>Data flow issuesJava</id>\n          </State>\n          <State>\n            <id>Data flow issuesJavaScript</id>\n          </State>\n          <State>\n            <id>Declaration redundancyGroovy</id>\n          </State>\n          <State>\n            <id>Declaration redundancyJava</id>\n          </State>\n          <State>\n            <id>ECMAScript 6 migration aidsJavaScript</id>\n          </State>\n          <State>\n            <id>Faces Model</id>\n          </State>\n          <State>\n            <id>Finalization issuesJava</id>\n          </State>\n          <State>\n            <id>FlexUnit inspections</id>\n          </State>\n          <State>\n            <id>General</id>\n          </State>\n          <State>\n            <id>GeneralJava</id>\n          </State>\n          <State>\n            <id>GeneralJavaScript</id>\n          </State>\n          <State>\n            <id>Google Web Toolkit issues</id>\n          </State>\n          <State>\n            <id>Groovy</id>\n          </State>\n          <State>\n            <id>Guice Inspections</id>\n          </State>\n          <State>\n            <id>HTML</id>\n          </State>\n          <State>\n            <id>Hibernate Issues</id>\n          </State>\n          <State>\n            <id>Inheritance issuesJava</id>\n          </State>\n          <State>\n            <id>Initialization issuesJava</id>\n          </State>\n          <State>\n            <id>Internationalization issuesJava</id>\n          </State>\n          <State>\n            <id>JBoss Seam issues</id>\n          </State>\n          <State>\n            <id>JPA issues</id>\n          </State>\n          <State>\n            <id>JSON</id>\n          </State>\n          <State>\n            <id>JUnit issuesJava</id>\n          </State>\n          <State>\n            <id>Java</id>\n          </State>\n          <State>\n            <id>Java 9Java language level migration aidsJava</id>\n          </State>\n          <State>\n            <id>Java EE issues</id>\n          </State>\n          <State>\n            <id>Java language level migration aidsJava</id>\n          </State>\n          <State>\n            <id>JavaFX</id>\n          </State>\n          <State>\n            <id>JavaScript</id>\n          </State>\n          <State>\n            <id>JavaScript validity issuesJavaScript</id>\n          </State>\n          <State>\n            <id>Kotlin</id>\n          </State>\n          <State>\n            <id>Maven</id>\n          </State>\n          <State>\n            <id>Modularization issuesJava</id>\n          </State>\n          <State>\n            <id>Naming conventionsJava</id>\n          </State>\n          <State>\n            <id>Numeric issuesJava</id>\n          </State>\n          <State>\n            <id>Other problemsKotlin</id>\n          </State>\n          <State>\n            <id>Packaging issuesJava</id>\n          </State>\n          <State>\n            <id>Performance issuesJava</id>\n          </State>\n          <State>\n            <id>Plugin DevKit</id>\n          </State>\n          <State>\n            <id>Potentially confusing code constructsJavaScript</id>\n          </State>\n          <State>\n            <id>Probable bugsGroovy</id>\n          </State>\n          <State>\n            <id>Probable bugsJava</id>\n          </State>\n          <State>\n            <id>Probable bugsJavaScript</id>\n          </State>\n          <State>\n            <id>Probable bugsKotlin</id>\n          </State>\n          <State>\n            <id>Properties Files</id>\n          </State>\n          <State>\n            <id>Redundant constructsKotlin</id>\n          </State>\n          <State>\n            <id>Reflective access issuesJava</id>\n          </State>\n          <State>\n            <id>RegExp</id>\n          </State>\n          <State>\n            <id>SQL</id>\n          </State>\n          <State>\n            <id>Serialization issuesJava</id>\n          </State>\n          <State>\n            <id>Spring</id>\n          </State>\n          <State>\n            <id>Spring CoreSpring</id>\n          </State>\n          <State>\n            <id>Struts</id>\n          </State>\n          <State>\n            <id>Struts 1Struts</id>\n          </State>\n          <State>\n            <id>Style issuesKotlin</id>\n          </State>\n          <State>\n            <id>TestNGJava</id>\n          </State>\n          <State>\n            <id>Threading issuesJava</id>\n          </State>\n          <State>\n            <id>UI Form Problems</id>\n          </State>\n          <State>\n            <id>Validity issuesGroovy</id>\n          </State>\n          <State>\n            <id>Verbose or redundant code constructsJava</id>\n          </State>\n          <State>\n            <id>Visibility issuesJava</id>\n          </State>\n          <State>\n            <id>XML</id>\n          </State>\n          <State>\n            <id>XMLSpring CoreSpring</id>\n          </State>\n          <State>\n            <id>XPath</id>\n          </State>\n          <State>\n            <id>XSLT</id>\n          </State>\n        </expanded-state>\n        <selected-state>\n          <State>\n            <id>Duplicates</id>\n          </State>\n        </selected-state>\n      </profile-state>\n    </entry>\n  </component>\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\n  <component name=\"ProjectView\">\n    <navigator currentView=\"ProjectPane\" proportions=\"\" version=\"1\">\n      <flattenPackages />\n      <showMembers />\n      <showModules />\n      <showLibraryContents />\n      <hideEmptyPackages />\n      <abbreviatePackageNames />\n      <autoscrollToSource />\n      <autoscrollFromSource />\n      <sortByType />\n      <manualOrder />\n      <foldersAlwaysOnTop value=\"true\" />\n    </navigator>\n    <panes>\n      <pane id=\"ProjectPane\">\n        <subPane>\n          <expand>\n            <path>\n              <item name=\"Reversi\" type=\"b2602c69:ProjectViewProjectNode\" />\n              <item name=\"Reversi\" type=\"462c0819:PsiDirectoryNode\" />\n            </path>\n            <path>\n              <item name=\"Reversi\" type=\"b2602c69:ProjectViewProjectNode\" />\n              <item name=\"Reversi\" type=\"462c0819:PsiDirectoryNode\" />\n              <item name=\"src\" type=\"462c0819:PsiDirectoryNode\" />\n            </path>\n            <path>\n              <item name=\"Reversi\" type=\"b2602c69:ProjectViewProjectNode\" />\n              <item name=\"Reversi\" type=\"462c0819:PsiDirectoryNode\" />\n              <item name=\"src\" type=\"462c0819:PsiDirectoryNode\" />\n              <item name=\"game\" type=\"462c0819:PsiDirectoryNode\" />\n            </path>\n            <path>\n              <item name=\"Reversi\" type=\"b2602c69:ProjectViewProjectNode\" />\n              <item name=\"Reversi\" type=\"462c0819:PsiDirectoryNode\" />\n              <item name=\"src\" type=\"462c0819:PsiDirectoryNode\" />\n              <item name=\"player\" type=\"462c0819:PsiDirectoryNode\" />\n            </path>\n            <path>\n              <item name=\"Reversi\" type=\"b2602c69:ProjectViewProjectNode\" />\n              <item name=\"Reversi\" type=\"462c0819:PsiDirectoryNode\" />\n              <item name=\"src\" type=\"462c0819:PsiDirectoryNode\" />\n              <item name=\"player\" type=\"462c0819:PsiDirectoryNode\" />\n              <item name=\"ai\" type=\"462c0819:PsiDirectoryNode\" />\n            </path>\n          </expand>\n          <select />\n        </subPane>\n      </pane>\n      <pane id=\"AndroidView\" />\n      <pane id=\"Scope\" />\n      <pane id=\"PackagesPane\" />\n      <pane id=\"Scratches\" />\n    </panes>\n  </component>\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"RunOnceActivity.OpenProjectViewOnStart\": \"true\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\n    \"WebServerToolWindowFactoryState\": \"false\",\n    \"git-widget-placeholder\": \"master\",\n    \"jdk.selected.JAVA_MODULE\": \"1.8\",\n    \"last_opened_file_path\": \"/home/jacob/Downloads/messenger.jar\",\n    \"node.js.detected.package.eslint\": \"true\",\n    \"node.js.detected.package.tslint\": \"true\",\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\n    \"nodejs_package_manager_path\": \"npm\",\n    \"project.structure.last.edited\": \"Modules\",\n    \"project.structure.proportion\": \"0.0\",\n    \"project.structure.side.proportion\": \"0.0\",\n    \"run.code.analysis.last.selected.profile\": \"pProject Default\",\n    \"settings.editor.selected.configurable\": \"preferences.pluginManager\",\n    \"vue.rearranger.settings.migration\": \"true\"\n  }\n}]]></component>\n  <component name=\"RecentsManager\">\n    <key name=\"CopyClassDialog.RECENTS_KEY\">\n      <recent name=\"player.ai\" />\n    </key>\n  </component>\n  <component name=\"RunManager\" selected=\"Application.Controller\">\n    <configuration default=\"true\" type=\"Applet\" factoryName=\"Applet\">\n      <option name=\"HTML_USED\" value=\"false\" />\n      <option name=\"WIDTH\" value=\"400\" />\n      <option name=\"HEIGHT\" value=\"300\" />\n      <option name=\"POLICY_FILE\" value=\"$APPLICATION_HOME_DIR$/bin/appletviewer.policy\" />\n      <module />\n    </configuration>\n    <configuration name=\"BoardPrinter\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\n      <option name=\"MAIN_CLASS_NAME\" value=\"game.BoardPrinter\" />\n      <module name=\"Reversi\" />\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$\" />\n      <extension name=\"coverage\">\n        <pattern>\n          <option name=\"PATTERN\" value=\"game.*\" />\n          <option name=\"ENABLED\" value=\"true\" />\n        </pattern>\n      </extension>\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <configuration name=\"Controller\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\n      <option name=\"MAIN_CLASS_NAME\" value=\"game.Controller\" />\n      <module name=\"Reversi\" />\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$\" />\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <configuration default=\"true\" type=\"Application\" factoryName=\"Application\">\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$\" />\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <configuration default=\"true\" type=\"JUnit\" factoryName=\"JUnit\">\n      <option name=\"TEST_OBJECT\" value=\"class\" />\n      <option name=\"WORKING_DIRECTORY\" value=\"$MODULE_DIR$\" />\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <configuration default=\"true\" type=\"TestNG\">\n      <option name=\"TEST_OBJECT\" value=\"CLASS\" />\n      <option name=\"WORKING_DIRECTORY\" value=\"$MODULE_DIR$\" />\n      <properties />\n      <listeners />\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <configuration default=\"true\" type=\"#org.jetbrains.idea.devkit.run.PluginConfigurationType\">\n      <module name=\"\" />\n      <option name=\"VM_PARAMETERS\" value=\"-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea\" />\n      <option name=\"PROGRAM_PARAMETERS\" />\n      <predefined_log_file enabled=\"true\" id=\"idea.log\" />\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <list>\n      <item itemvalue=\"Application.Controller\" />\n      <item itemvalue=\"Application.BoardPrinter\" />\n    </list>\n    <recent_temporary>\n      <list>\n        <item itemvalue=\"Application.Controller\" />\n        <item itemvalue=\"Application.BoardPrinter\" />\n      </list>\n    </recent_temporary>\n  </component>\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"5ccee63e-a0fa-4840-b8fb-e97bb953fea3\" name=\"Default\" comment=\"\" />\n      <created>1514289921818</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1514289921818</updated>\n      <workItem from=\"1514289923937\" duration=\"6503000\" />\n      <workItem from=\"1514308789233\" duration=\"5461000\" />\n      <workItem from=\"1514641925823\" duration=\"598000\" />\n      <workItem from=\"1514702780943\" duration=\"6936000\" />\n      <workItem from=\"1514877519669\" duration=\"21993000\" />\n      <workItem from=\"1516176692674\" duration=\"7570000\" />\n      <workItem from=\"1516261787752\" duration=\"20931000\" />\n      <workItem from=\"1516462064498\" duration=\"14412000\" />\n      <workItem from=\"1516535384424\" duration=\"18743000\" />\n      <workItem from=\"1516600300846\" duration=\"34000\" />\n      <workItem from=\"1516688564948\" duration=\"941000\" />\n      <workItem from=\"1680721938362\" duration=\"109000\" />\n      <workItem from=\"1680722052137\" duration=\"23000\" />\n      <workItem from=\"1680722092104\" duration=\"40000\" />\n      <workItem from=\"1680722148465\" duration=\"21000\" />\n      <workItem from=\"1680722181521\" duration=\"465000\" />\n      <workItem from=\"1680722778417\" duration=\"7676000\" />\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"remove all parts of ai\">\n      <created>1680807258983</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1680807258983</updated>\n    </task>\n    <task id=\"LOCAL-00002\" summary=\"rewrite MVC notifying String and payload\">\n      <created>1680819595145</created>\n      <option name=\"number\" value=\"00002\" />\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1680819595145</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"3\" />\n    <servers />\n  </component>\n  <component name=\"TimeTrackingManager\">\n    <option name=\"totallyTimeSpent\" value=\"104122000\" />\n  </component>\n  <component name=\"ToolWindowManager\">\n    <frame x=\"0\" y=\"22\" width=\"1440\" height=\"809\" extended-state=\"0\" />\n    <editor active=\"true\" />\n    <layout>\n      <window_info id=\"Palette\" active=\"false\" anchor=\"right\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.33\" sideWeight=\"0.5\" order=\"5\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"TODO\" active=\"false\" anchor=\"bottom\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.33\" sideWeight=\"0.5\" order=\"10\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"Messages\" active=\"false\" anchor=\"bottom\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.32971507\" sideWeight=\"0.5\" order=\"1\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"Palette&#9;\" active=\"false\" anchor=\"right\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.33\" sideWeight=\"0.5\" order=\"1\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"Image Layers\" active=\"false\" anchor=\"left\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.33\" sideWeight=\"0.5\" order=\"6\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"Capture Analysis\" active=\"false\" anchor=\"right\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.33\" sideWeight=\"0.5\" order=\"3\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"Event Log\" active=\"false\" anchor=\"bottom\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.33\" sideWeight=\"0.5\" order=\"0\" side_tool=\"true\" content_ui=\"tabs\" />\n      <window_info id=\"Maven Projects\" active=\"false\" anchor=\"right\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.33\" sideWeight=\"0.5\" order=\"0\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"Run\" active=\"false\" anchor=\"bottom\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"true\" show_stripe_button=\"true\" weight=\"0.32971507\" sideWeight=\"0.5\" order=\"6\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"Version Control\" active=\"false\" anchor=\"bottom\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.33\" sideWeight=\"0.5\" order=\"2\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"Terminal\" active=\"false\" anchor=\"bottom\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.33\" sideWeight=\"0.5\" order=\"3\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"Capture Tool\" active=\"false\" anchor=\"left\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.33\" sideWeight=\"0.5\" order=\"0\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"Designer\" active=\"false\" anchor=\"left\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.33\" sideWeight=\"0.5\" order=\"1\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"Project\" active=\"false\" anchor=\"left\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"true\" show_stripe_button=\"true\" weight=\"0.21111111\" sideWeight=\"0.5\" order=\"4\" side_tool=\"false\" content_ui=\"combo\" />\n      <window_info id=\"Database\" active=\"false\" anchor=\"right\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.33\" sideWeight=\"0.5\" order=\"2\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"Structure\" active=\"false\" anchor=\"left\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.25\" sideWeight=\"0.5\" order=\"5\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"Ant Build\" active=\"false\" anchor=\"right\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.25\" sideWeight=\"0.5\" order=\"7\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"UI Designer\" active=\"false\" anchor=\"left\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.33\" sideWeight=\"0.5\" order=\"2\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"Theme Preview\" active=\"false\" anchor=\"right\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.33\" sideWeight=\"0.5\" order=\"4\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"Debug\" active=\"false\" anchor=\"bottom\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.4\" sideWeight=\"0.5\" order=\"7\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"Favorites\" active=\"false\" anchor=\"left\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.33\" sideWeight=\"0.5\" order=\"3\" side_tool=\"true\" content_ui=\"tabs\" />\n      <window_info id=\"Cvs\" active=\"false\" anchor=\"bottom\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.25\" sideWeight=\"0.5\" order=\"8\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"Message\" active=\"false\" anchor=\"bottom\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.33\" sideWeight=\"0.5\" order=\"4\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"Commander\" active=\"false\" anchor=\"right\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.4\" sideWeight=\"0.5\" order=\"6\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"Hierarchy\" active=\"false\" anchor=\"right\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.25\" sideWeight=\"0.5\" order=\"8\" side_tool=\"false\" content_ui=\"combo\" />\n      <window_info id=\"Inspection\" active=\"false\" anchor=\"bottom\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.4\" sideWeight=\"0.5\" order=\"9\" side_tool=\"false\" content_ui=\"tabs\" />\n      <window_info id=\"Find\" active=\"false\" anchor=\"bottom\" auto_hide=\"false\" internal_type=\"DOCKED\" type=\"DOCKED\" visible=\"false\" show_stripe_button=\"true\" weight=\"0.33\" sideWeight=\"0.5\" order=\"5\" side_tool=\"false\" content_ui=\"tabs\" />\n    </layout>\n  </component>\n  <component name=\"TypeScriptGeneratedFilesManager\">\n    <option name=\"version\" value=\"3\" />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State />\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"remove all parts of ai\" />\n    <MESSAGE value=\"rewrite MVC notifying String and payload\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"rewrite MVC notifying String and payload\" />\n  </component>\n  <component name=\"XSLT-Support.FileAssociations.UIState\">\n    <expand />\n    <select />\n  </component>\n  <component name=\"editorHistoryManager\">\n    <entry file=\"file://$PROJECT_DIR$/src/player/ai/Minimax.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"630\">\n          <caret line=\"46\" column=\"14\" lean-forward=\"false\" selection-start-line=\"46\" selection-start-column=\"14\" selection-end-line=\"46\" selection-end-column=\"14\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/BoardPrinter.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"150\">\n          <caret line=\"13\" column=\"5\" lean-forward=\"false\" selection-start-line=\"13\" selection-start-column=\"5\" selection-end-line=\"13\" selection-end-column=\"5\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/GamePlayer.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"120\">\n          <caret line=\"10\" column=\"0\" lean-forward=\"false\" selection-start-line=\"10\" selection-start-column=\"0\" selection-end-line=\"10\" selection-end-column=\"0\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/GameWindow.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"195\">\n          <caret line=\"13\" column=\"32\" lean-forward=\"true\" selection-start-line=\"13\" selection-start-column=\"32\" selection-end-line=\"13\" selection-end-column=\"32\" />\n          <folding>\n            <element signature=\"imports\" expanded=\"true\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/BoardCell.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"0\">\n          <caret line=\"0\" column=\"0\" lean-forward=\"false\" selection-start-line=\"0\" selection-start-column=\"0\" selection-end-line=\"0\" selection-end-column=\"0\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/GameEngine.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"45\">\n          <caret line=\"3\" column=\"17\" lean-forward=\"false\" selection-start-line=\"3\" selection-start-column=\"17\" selection-end-line=\"3\" selection-end-column=\"17\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/BoardHelper.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"4290\">\n          <caret line=\"289\" column=\"0\" lean-forward=\"true\" selection-start-line=\"289\" selection-start-column=\"0\" selection-end-line=\"289\" selection-end-column=\"0\" />\n          <folding>\n            <element signature=\"imports\" expanded=\"true\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/player/ai/Evaluator.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"300\">\n          <caret line=\"20\" column=\"1\" lean-forward=\"true\" selection-start-line=\"20\" selection-start-column=\"1\" selection-end-line=\"20\" selection-end-column=\"1\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/player/ai/Minimax.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"195\">\n          <caret line=\"16\" column=\"28\" lean-forward=\"true\" selection-start-line=\"16\" selection-start-column=\"28\" selection-end-line=\"16\" selection-end-column=\"28\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/player/ai/AIPlayerDynamic.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"300\">\n          <caret line=\"26\" column=\"38\" lean-forward=\"true\" selection-start-line=\"26\" selection-start-column=\"38\" selection-end-line=\"26\" selection-end-column=\"38\" />\n          <folding>\n            <element signature=\"e#571#572#0\" expanded=\"false\" />\n            <element signature=\"e#643#644#0\" expanded=\"false\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/BoardPrinter.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"345\">\n          <caret line=\"24\" column=\"5\" lean-forward=\"true\" selection-start-line=\"24\" selection-start-column=\"5\" selection-end-line=\"24\" selection-end-column=\"5\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/GamePlayer.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"120\">\n          <caret line=\"10\" column=\"0\" lean-forward=\"true\" selection-start-line=\"10\" selection-start-column=\"0\" selection-end-line=\"10\" selection-end-column=\"0\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/GameWindow.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"90\">\n          <caret line=\"6\" column=\"4\" lean-forward=\"false\" selection-start-line=\"6\" selection-start-column=\"4\" selection-end-line=\"15\" selection-end-column=\"5\" />\n          <folding>\n            <element signature=\"imports\" expanded=\"true\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/BoardCell.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"60\">\n          <caret line=\"7\" column=\"13\" lean-forward=\"false\" selection-start-line=\"7\" selection-start-column=\"13\" selection-end-line=\"7\" selection-end-column=\"13\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/GamePanel.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"285\">\n          <caret line=\"19\" column=\"28\" lean-forward=\"true\" selection-start-line=\"19\" selection-start-column=\"28\" selection-end-line=\"19\" selection-end-column=\"28\" />\n          <folding>\n            <element signature=\"imports\" expanded=\"true\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/GamePlayer.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"60\">\n          <caret line=\"4\" column=\"22\" lean-forward=\"false\" selection-start-line=\"4\" selection-start-column=\"22\" selection-end-line=\"4\" selection-end-column=\"22\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/GameWindow.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"60\">\n          <caret line=\"4\" column=\"13\" lean-forward=\"false\" selection-start-line=\"4\" selection-start-column=\"13\" selection-end-line=\"4\" selection-end-column=\"13\" />\n          <folding>\n            <element signature=\"imports\" expanded=\"true\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/player/RandomPlayer.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"300\">\n          <caret line=\"24\" column=\"0\" lean-forward=\"true\" selection-start-line=\"24\" selection-start-column=\"0\" selection-end-line=\"24\" selection-end-column=\"0\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/BoardCell.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"960\">\n          <caret line=\"69\" column=\"0\" lean-forward=\"false\" selection-start-line=\"69\" selection-start-column=\"0\" selection-end-line=\"69\" selection-end-column=\"0\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/GameWindow.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"195\">\n          <caret line=\"13\" column=\"5\" lean-forward=\"false\" selection-start-line=\"13\" selection-start-column=\"5\" selection-end-line=\"13\" selection-end-column=\"5\" />\n          <folding>\n            <element signature=\"imports\" expanded=\"true\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/GamePanel.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"1035\">\n          <caret line=\"75\" column=\"28\" lean-forward=\"false\" selection-start-line=\"75\" selection-start-column=\"28\" selection-end-line=\"75\" selection-end-column=\"28\" />\n          <folding>\n            <element signature=\"imports\" expanded=\"true\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/BoardCell.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"960\">\n          <caret line=\"69\" column=\"0\" lean-forward=\"false\" selection-start-line=\"69\" selection-start-column=\"0\" selection-end-line=\"69\" selection-end-column=\"0\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/GameWindow.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"195\">\n          <caret line=\"13\" column=\"5\" lean-forward=\"false\" selection-start-line=\"13\" selection-start-column=\"5\" selection-end-line=\"13\" selection-end-column=\"5\" />\n          <folding>\n            <element signature=\"imports\" expanded=\"true\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/GamePanel.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"1035\">\n          <caret line=\"75\" column=\"28\" lean-forward=\"false\" selection-start-line=\"75\" selection-start-column=\"28\" selection-end-line=\"75\" selection-end-column=\"28\" />\n          <folding>\n            <element signature=\"imports\" expanded=\"true\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/BoardCell.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"0\">\n          <caret line=\"0\" column=\"0\" lean-forward=\"false\" selection-start-line=\"0\" selection-start-column=\"0\" selection-end-line=\"0\" selection-end-column=\"0\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/GamePanel.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"690\">\n          <caret line=\"52\" column=\"55\" lean-forward=\"false\" selection-start-line=\"52\" selection-start-column=\"55\" selection-end-line=\"52\" selection-end-column=\"55\" />\n          <folding>\n            <element signature=\"imports\" expanded=\"true\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/GameWindow.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"195\">\n          <caret line=\"13\" column=\"5\" lean-forward=\"true\" selection-start-line=\"13\" selection-start-column=\"5\" selection-end-line=\"13\" selection-end-column=\"5\" />\n          <folding>\n            <element signature=\"imports\" expanded=\"true\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/BoardCell.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"945\">\n          <caret line=\"68\" column=\"36\" lean-forward=\"false\" selection-start-line=\"68\" selection-start-column=\"36\" selection-end-line=\"68\" selection-end-column=\"36\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/player/ai/StaticEvaluator2.java\" />\n    <entry file=\"file://$PROJECT_DIR$/src/player/ai/ZorbistHash.java\" />\n    <entry file=\"file://$PROJECT_DIR$/src/player/GreedyPlayer.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"420\">\n          <caret line=\"38\" column=\"9\" lean-forward=\"false\" selection-start-line=\"38\" selection-start-column=\"9\" selection-end-line=\"38\" selection-end-column=\"9\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/player/HumanPlayer.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"225\">\n          <caret line=\"23\" column=\"35\" lean-forward=\"false\" selection-start-line=\"23\" selection-start-column=\"35\" selection-end-line=\"23\" selection-end-column=\"35\" />\n          <folding>\n            <element signature=\"e#379#380#0\" expanded=\"false\" />\n            <element signature=\"e#406#407#0\" expanded=\"false\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/.gitignore\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"0\">\n          <caret line=\"0\" column=\"0\" lean-forward=\"false\" selection-start-line=\"0\" selection-start-column=\"0\" selection-end-line=\"0\" selection-end-column=\"0\" />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/player/RandomPlayer.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"285\">\n          <caret line=\"29\" column=\"0\" lean-forward=\"true\" selection-start-line=\"29\" selection-start-column=\"0\" selection-end-line=\"29\" selection-end-column=\"0\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/GameEngine.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"45\">\n          <caret line=\"3\" column=\"17\" lean-forward=\"false\" selection-start-line=\"3\" selection-start-column=\"17\" selection-end-line=\"3\" selection-end-column=\"17\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/player/ai/AIPlayerStatic.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"285\">\n          <caret line=\"24\" column=\"23\" lean-forward=\"false\" selection-start-line=\"24\" selection-start-column=\"23\" selection-end-line=\"24\" selection-end-column=\"25\" />\n          <folding>\n            <element signature=\"e#567#568#0\" expanded=\"false\" />\n            <element signature=\"e#639#640#0\" expanded=\"false\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/player/ai/AIPlayerRealtime.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"570\">\n          <caret line=\"40\" column=\"69\" lean-forward=\"false\" selection-start-line=\"40\" selection-start-column=\"69\" selection-end-line=\"40\" selection-end-column=\"69\" />\n          <folding>\n            <element signature=\"e#1686#1687#0\" expanded=\"false\" />\n            <element signature=\"e#1750#1751#0\" expanded=\"false\" />\n            <element signature=\"e#1804#1805#0\" expanded=\"false\" />\n            <element signature=\"e#1876#1877#0\" expanded=\"false\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/player/ai/AIPlayerDynamic.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"285\">\n          <caret line=\"24\" column=\"23\" lean-forward=\"false\" selection-start-line=\"24\" selection-start-column=\"23\" selection-end-line=\"24\" selection-end-column=\"23\" />\n          <folding>\n            <element signature=\"e#571#572#0\" expanded=\"false\" />\n            <element signature=\"e#643#644#0\" expanded=\"false\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/BoardPrinter.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"60\">\n          <caret line=\"5\" column=\"13\" lean-forward=\"false\" selection-start-line=\"5\" selection-start-column=\"13\" selection-end-line=\"5\" selection-end-column=\"13\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_144.jdk/Contents/Home/src.zip!/java/util/ArrayList.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"149\">\n          <caret line=\"428\" column=\"0\" lean-forward=\"false\" selection-start-line=\"428\" selection-start-column=\"0\" selection-end-line=\"428\" selection-end-column=\"0\" />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/player/ai/StaticEvaluator.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"315\">\n          <caret line=\"21\" column=\"3\" lean-forward=\"true\" selection-start-line=\"21\" selection-start-column=\"3\" selection-end-line=\"28\" selection-end-column=\"5\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/GameWindow.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"195\">\n          <caret line=\"14\" column=\"32\" lean-forward=\"false\" selection-start-line=\"14\" selection-start-column=\"32\" selection-end-line=\"14\" selection-end-column=\"32\" />\n          <folding>\n            <element signature=\"imports\" expanded=\"true\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/player/ai/DynamicEvaluator.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"570\">\n          <caret line=\"40\" column=\"0\" lean-forward=\"false\" selection-start-line=\"40\" selection-start-column=\"0\" selection-end-line=\"40\" selection-end-column=\"0\" />\n          <folding>\n            <element signature=\"imports\" expanded=\"true\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/GamePlayer.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"60\">\n          <caret line=\"4\" column=\"0\" lean-forward=\"false\" selection-start-line=\"4\" selection-start-column=\"0\" selection-end-line=\"18\" selection-end-column=\"0\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/player/ai/OpeningBook.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"2100\">\n          <caret line=\"142\" column=\"0\" lean-forward=\"false\" selection-start-line=\"6\" selection-start-column=\"0\" selection-end-line=\"142\" selection-end-column=\"0\" />\n          <folding>\n            <element signature=\"imports\" expanded=\"true\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/BoardHelper.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"8055\">\n          <caret line=\"540\" column=\"0\" lean-forward=\"false\" selection-start-line=\"5\" selection-start-column=\"0\" selection-end-line=\"540\" selection-end-column=\"0\" />\n          <folding>\n            <element signature=\"imports\" expanded=\"true\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/player/ai/Evaluator.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"30\">\n          <caret line=\"2\" column=\"7\" lean-forward=\"false\" selection-start-line=\"2\" selection-start-column=\"7\" selection-end-line=\"7\" selection-end-column=\"0\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/player/ai/RealtimeEvaluator.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"2220\">\n          <caret line=\"153\" column=\"0\" lean-forward=\"false\" selection-start-line=\"9\" selection-start-column=\"7\" selection-end-line=\"157\" selection-end-column=\"1\" />\n          <folding>\n            <element signature=\"imports\" expanded=\"true\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/player/ai/Minimax.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"1755\">\n          <caret line=\"121\" column=\"4\" lean-forward=\"false\" selection-start-line=\"121\" selection-start-column=\"4\" selection-end-line=\"121\" selection-end-column=\"4\" />\n          <folding />\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/player/ai/AIPlayerRealtimeKiller.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"765\">\n          <caret line=\"55\" column=\"39\" lean-forward=\"false\" selection-start-line=\"55\" selection-start-column=\"39\" selection-end-line=\"55\" selection-end-column=\"39\" />\n          <folding>\n            <element signature=\"imports\" expanded=\"true\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n    <entry file=\"file://$PROJECT_DIR$/src/game/GamePanel.java\">\n      <provider selected=\"true\" editor-type-id=\"text-editor\">\n        <state relative-caret-position=\"-1472\">\n          <caret line=\"24\" column=\"24\" lean-forward=\"true\" selection-start-line=\"24\" selection-start-column=\"24\" selection-end-line=\"24\" selection-end-column=\"24\" />\n          <folding>\n            <element signature=\"imports\" expanded=\"true\" />\n          </folding>\n        </state>\n      </provider>\n    </entry>\n  </component>\n  <component name=\"masterDetails\">\n    <states>\n      <state key=\"ProjectJDKs.UI\">\n        <settings>\n          <last-edited>1.8</last-edited>\n          <splitter-proportions>\n            <option name=\"proportions\">\n              <list>\n                <option value=\"0.2\" />\n              </list>\n            </option>\n          </splitter-proportions>\n        </settings>\n      </state>\n    </states>\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision e7d7713921d070a9739c17467b178411463b7c48)
++++ b/.idea/workspace.xml	(date 1680896496532)
+@@ -7,7 +7,23 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" name="Default" comment="rewrite MVC notifying String and payload" />
++    <list default="true" id="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" name="Default" comment="add workspace.xml">
++      <change afterPath="$PROJECT_DIR$/src/game/Directions.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/game/Position.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/game/Square.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/game/BoardHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/BoardHelper.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/game/BoardPrinter.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/game/GameEngine.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/game/GamePanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/GamePanel.java" afterDir="false" />
++    </list>
++    <list id="2657a3e1-893d-4062-b71b-ed4e6087fa11" name="Changes by student" comment="">
++      <change beforePath="$PROJECT_DIR$/src/game/BoardCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/BoardCell.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/game/BoardHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/BoardHelper.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/game/GamePanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/GamePanel.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/game/GamePlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Player.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/game/HumanPlayer.java" beforeDir="false" />
++    </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+@@ -139,8 +155,52 @@
+     </option>
+   </component>
+   <component name="Git.Settings">
++    <option name="RECENT_BRANCH_BY_REPOSITORY">
++      <map>
++        <entry key="$PROJECT_DIR$" value="MVC" />
++      </map>
++    </option>
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+   </component>
++  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
++  "lastFilter": {
++    "state": "OPEN"
++  }
++}]]></component>
++  <component name="GitToolBoxStore">
++    <option name="projectConfigVersion" value="5" />
++    <option name="recentBranches">
++      <RecentBranches>
++        <option name="branchesForRepo">
++          <list>
++            <RecentBranchesForRepo>
++              <option name="branches">
++                <list>
++                  <RecentBranch>
++                    <option name="branchName" value="master" />
++                    <option name="lastUsedInstant" value="1680819824" />
++                  </RecentBranch>
++                  <RecentBranch>
++                    <option name="branchName" value="MVC" />
++                    <option name="lastUsedInstant" value="1680819778" />
++                  </RecentBranch>
++                </list>
++              </option>
++              <option name="repositoryRootUrl" value="file://$PROJECT_DIR$" />
++            </RecentBranchesForRepo>
++          </list>
++        </option>
++      </RecentBranches>
++    </option>
++  </component>
++  <component name="GithubPullRequestsUISettings">
++    <option name="selectedUrlAndAccountId">
++      <UrlAndAccount>
++        <option name="accountId" value="d1e99d0f-b166-47e4-993c-9bed694cfd6e" />
++        <option name="url" value="https://github.com/GalexY727/MVC-Othello" />
++      </UrlAndAccount>
++    </option>
++  </component>
+   <component name="GradleLocalSettings">
+     <option name="externalProjectsViewState">
+       <projects_view />
+@@ -190,6 +250,44 @@
+     <detection-done>true</detection-done>
+     <sorting>DEFINITION_ORDER</sorting>
+   </component>
++  <component name="LineStatusTrackerManager">
++    <file path="$PROJECT_DIR$/src/game/GamePanel.java">
++      <ranges>
++        <range start1="10" end1="11" start2="10" end2="11" changelist="2657a3e1-893d-4062-b71b-ed4e6087fa11" />
++        <range start1="31" end1="33" start2="31" end2="33" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
++        <range start1="38" end1="39" start2="38" end2="38" changelist="2657a3e1-893d-4062-b71b-ed4e6087fa11" />
++        <range start1="43" end1="44" start2="42" end2="42" changelist="2657a3e1-893d-4062-b71b-ed4e6087fa11" />
++        <range start1="122" end1="123" start2="120" end2="121" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
++        <range start1="125" end1="132" start2="123" end2="126" changelist="2657a3e1-893d-4062-b71b-ed4e6087fa11" />
++        <range start1="139" end1="147" start2="133" end2="137" changelist="2657a3e1-893d-4062-b71b-ed4e6087fa11" />
++        <range start1="153" end1="154" start2="143" end2="144" changelist="2657a3e1-893d-4062-b71b-ed4e6087fa11" />
++        <range start1="157" end1="158" start2="147" end2="148" changelist="2657a3e1-893d-4062-b71b-ed4e6087fa11" />
++        <range start1="180" end1="181" start2="170" end2="171" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
++        <range start1="187" end1="189" start2="177" end2="179" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
++        <range start1="190" end1="191" start2="180" end2="181" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
++        <range start1="192" end1="193" start2="182" end2="183" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
++        <range start1="198" end1="200" start2="188" end2="190" changelist="2657a3e1-893d-4062-b71b-ed4e6087fa11" />
++        <range start1="205" end1="207" start2="195" end2="199" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
++        <range start1="209" end1="210" start2="201" end2="201" changelist="2657a3e1-893d-4062-b71b-ed4e6087fa11" />
++        <range start1="237" end1="242" start2="228" end2="229" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
++        <range start1="245" end1="246" start2="232" end2="233" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
++      </ranges>
++    </file>
++    <file path="$PROJECT_DIR$/src/game/BoardHelper.java">
++      <ranges>
++        <range start1="8" end1="9" start2="8" end2="9" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
++        <range start1="18" end1="20" start2="18" end2="20" changelist="2657a3e1-893d-4062-b71b-ed4e6087fa11" />
++        <range start1="34" end1="35" start2="34" end2="35" changelist="2657a3e1-893d-4062-b71b-ed4e6087fa11" />
++        <range start1="45" end1="59" start2="45" end2="47" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
++        <range start1="61" end1="197" start2="49" end2="65" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
++        <range start1="198" end1="209" start2="66" end2="68" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
++        <range start1="210" end1="239" start2="69" end2="82" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
++        <range start1="240" end1="252" start2="83" end2="85" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
++        <range start1="253" end1="261" start2="86" end2="121" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
++        <range start1="262" end1="265" start2="122" end2="122" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
++      </ranges>
++    </file>
++  </component>
+   <component name="MarkdownSettingsMigration">
+     <option name="stateVersion" value="1" />
+   </component>
+@@ -534,6 +632,7 @@
+     "RunOnceActivity.ShowReadmeOnStart": "true",
+     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+     "WebServerToolWindowFactoryState": "false",
++    "codeWithMe.voiceChat.enabledByDefault": "false",
+     "git-widget-placeholder": "master",
+     "jdk.selected.JAVA_MODULE": "1.8",
+     "last_opened_file_path": "/home/jacob/Downloads/messenger.jar",
+@@ -624,6 +723,8 @@
+       <list>
+         <item itemvalue="Application.Controller" />
+         <item itemvalue="Application.BoardPrinter" />
++        <item itemvalue="Application.Controller" />
++        <item itemvalue="Application.BoardPrinter" />
+       </list>
+     </recent_temporary>
+   </component>
+@@ -651,7 +752,8 @@
+       <workItem from="1680722092104" duration="40000" />
+       <workItem from="1680722148465" duration="21000" />
+       <workItem from="1680722181521" duration="465000" />
+-      <workItem from="1680722778417" duration="7676000" />
++      <workItem from="1680722778417" duration="8620000" />
++      <workItem from="1680893290834" duration="3203000" />
+     </task>
+     <task id="LOCAL-00001" summary="remove all parts of ai">
+       <created>1680807258983</created>
+@@ -667,7 +769,14 @@
+       <option name="project" value="LOCAL" />
+       <updated>1680819595145</updated>
+     </task>
+-    <option name="localTasksCounter" value="3" />
++    <task id="LOCAL-00003" summary="add workspace.xml">
++      <created>1680819629299</created>
++      <option name="number" value="00003" />
++      <option name="presentableId" value="LOCAL-00003" />
++      <option name="project" value="LOCAL" />
++      <updated>1680819629299</updated>
++    </task>
++    <option name="localTasksCounter" value="4" />
+     <servers />
+   </component>
+   <component name="TimeTrackingManager">
+@@ -723,7 +832,8 @@
+   <component name="VcsManagerConfiguration">
+     <MESSAGE value="remove all parts of ai" />
+     <MESSAGE value="rewrite MVC notifying String and payload" />
+-    <option name="LAST_COMMIT_MESSAGE" value="rewrite MVC notifying String and payload" />
++    <MESSAGE value="add workspace.xml" />
++    <option name="LAST_COMMIT_MESSAGE" value="add workspace.xml" />
+   </component>
+   <component name="XSLT-Support.FileAssociations.UIState">
+     <expand />
+Index: src/game/Directions.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/game/Directions.java b/src/game/Directions.java
+new file mode 100644
+--- /dev/null	(date 1680896496084)
++++ b/src/game/Directions.java	(date 1680896496084)
+@@ -0,0 +1,41 @@
++package game;
++
++import java.awt.Point;
++/**
++ * Set up HashMap with the compass rose directions and
++ * pair with a vector that will implement the change
++ * in position
++ *
++ * @author Mr. Jaffe
++ * @version 1.0
++ */
++public class Directions {
++    /**
++     * Gets the requested direction vector
++     * @param compassPoint Direction whose vector we want to retrieve
++     * @return Direction vector
++     */
++    public static Position getVector(String compassPoint) {
++        switch (compassPoint) {
++            case "N":  return new Position(-1,0);
++            case "NE": return new Position(-1,1);
++            case "E":  return new Position(0,1);
++            case "SE": return new Position(1,1);
++            case "S":  return new Position(1,0);
++            case "SW": return new Position(1,-1);
++            case "W":  return new Position(0,-1);
++            case "NW": return new Position(-1,-1);
++        }
++        return null;
++    }
++
++    /**
++     * Gets an array of strings representing cardinal
++     * direction points
++     * @return Array of direction strings
++     */
++    public static String[] getDirections() {
++        return new String[]{"N","NE","E","SE","S","SW","W","NW"};
++    }
++
++}
