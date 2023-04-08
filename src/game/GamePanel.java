@@ -5,7 +5,6 @@ import com.mrjaffesclass.apcs.messenger.Messenger;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.util.Arrays;
 
 public class GamePanel extends JPanel implements MessageHandler {
@@ -108,7 +107,7 @@ public class GamePanel extends JPanel implements MessageHandler {
                         //after click this function should be call backed
                 }else{
                     //forfeit this move and pass the turn
-                    System.out.println("Player 1 has no legal moves !");
+                    mvcMessaging.notify("move:player", "Player 1 has no legal moves !");
                     turn = 2;
                     manageTurn();
                 }
@@ -118,14 +117,14 @@ public class GamePanel extends JPanel implements MessageHandler {
                         //after click this function should be call backed
                 }else{
                     //forfeit this move and pass the turn
-                    System.out.println("Player 2 has no legal moves !");
+                    mvcMessaging.notify("move:player", "Player 2 has no legal moves !");
                     turn = 1;
                     manageTurn();
                 }
             }
         }else{
             //game finished
-            System.out.println("Game Finished !");
+            mvcMessaging.notify("game:finished", "Game Finished !");
             int winner = BoardHelper.getWinner(board);
             if(winner==1) totalscore1++;
             else if(winner==2) totalscore2++;

@@ -122,9 +122,7 @@ public class BoardHelper {
         for (String direction : Directions.getDirections()) {
             Position directionVector = Directions.getVector(direction);
             if (makeMoveStep(playerToMove, board, positionToMove, directionVector, 0)) {
-                board = setSquare(playerToMove, board, positionToMove);
-//      } else {
-//        System.out.println("**** THIS SPACE IS NOT A VALID MOVE. YOU LOSE!");
+                setSquare(playerToMove, board, positionToMove);
             }
         }
         return board;
