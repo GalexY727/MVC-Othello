@@ -28,12 +28,6 @@ public class GamePanel extends JPanel implements GameEngine, MessageHandler {
     JLabel tscore1;
     JLabel tscore2;
 
-
-    GamePlayer player1 = new HumanPlayer(1);
-    GamePlayer player2 = new HumanPlayer(2);
-
-    Timer player1HandlerTimer;
-    Timer player2HandlerTimer;
     private final Messenger mvcMessaging;
 
     @Override
@@ -101,18 +95,6 @@ public class GamePanel extends JPanel implements GameEngine, MessageHandler {
         updateBoardInfo();
         updateTotalScore();
 
-        //AI Handler Timer (to unfreeze gui)
-        player1HandlerTimer = new Timer(1000,(ActionEvent e) -> {
-            handlePlayer(player1);
-            player1HandlerTimer.stop();
-            manageTurn();
-        });
-
-        player2HandlerTimer = new Timer(1000,(ActionEvent e) -> {
-            handlePlayer(player2);
-            player2HandlerTimer.stop();
-            manageTurn();
-        });
 
         manageTurn();
     }
@@ -120,48 +102,40 @@ public class GamePanel extends JPanel implements GameEngine, MessageHandler {
     private boolean awaitForClick = false;
 
     public void manageTurn(){
-        if(BoardHelper.hasAnyMoves(board,1) || BoardHelper.hasAnyMoves(board,2)) {
+        if(BoardHelper.anyMovesAvailable(board, 1) || BoardHelper.anyMovesAvailable(board, 2)) {
             updateBoardInfo();
             if (turn == 1) {
-                if(BoardHelper.hasAnyMoves(board,1)) {
-                    if (player1.isUserPlayer()) {
+                if(BoardHelper.anyMovesAvailable(board,1)) {
                         awaitForClick = true;
                         //after click this function should be call backed
-                    } else {
-                        player1HandlerTimer.start();
-                    }
                 }else{
                     //forfeit this move and pass the turn
-                    mvcMessaging.notify("move:player", "Player 1 has no legal moves !");
+                    System.out.println("Player 1 has no legal moves !");
                     turn = 2;
                     manageTurn();
                 }
             } else {
-                if(BoardHelper.hasAnyMoves(board,2)) {
-                    if (player2.isUserPlayer()) {
+                if(BoardHelper.anyMovesAvailable(board, 2)) {
                         awaitForClick = true;
                         //after click this function should be call backed
-                    } else {
-                        player2HandlerTimer.start();
-                    }
                 }else{
                     //forfeit this move and pass the turn
-                    mvcMessaging.notify("move:player", "Player 2 has no legal moves !");
+                    System.out.println("Player 2 has no legal moves !");
                     turn = 1;
                     manageTurn();
                 }
             }
         }else{
             //game finished
-            mvcMessaging.notify("game:finished", "Game Finished !");
+            System.out.println("Game Finished !");
             int winner = BoardHelper.getWinner(board);
             if(winner==1) totalscore1++;
             else if(winner==2) totalscore2++;
             updateTotalScore();
             //restart
-            //resetBoard();
-            //turn=1;
-            //manageTurn();
+            resetBoard();
+            turn=1;
+            manageTurn();
         }
     }
 
@@ -178,19 +152,19 @@ public class GamePanel extends JPanel implements GameEngine, MessageHandler {
     }
 
     //update highlights on possible moves and scores
-    public void updateBoardInfo(){
+    public void updateBoardInfo() {
 
         int p1score = 0;
         int p2score = 0;
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if(board[i][j] == 1) p1score++;
-                if(board[i][j] == 2) p2score++;
+                if (board[i][j] == 1) p1score++;
+                if (board[i][j] == 2) p2score++;
 
-                if(BoardHelper.canPlay(board,turn,i,j)){
+                if (BoardHelper.canPlay(board, turn, new Position(i, j))) {
                     cells[i][j].highlight = 1;
-                }else{
+                } else {
                     cells[i][j].highlight = 0;
                 }
             }
@@ -203,13 +177,19 @@ public class GamePanel extends JPanel implements GameEngine, MessageHandler {
     }
 
     public void updateTotalScore(){
-        tscore1.setText(player1.playerName() + " : " + totalscore1);
-        tscore2.setText(player2.playerName() + " : " + totalscore2);
+        tscore1.setText("Player 1: Black = " + totalscore1 +
+                ((totalscore1 == totalscore2) ? " (Tied)" :
+                        (totalscore1 > totalscore2) ? " (Winning)" :
+                                " (Losing)" ));
+
+        tscore2.setText("Player 2: White = " + totalscore2 +
+                ((totalscore2 == totalscore1) ? " (Tied) " :
+                        (totalscore2 > totalscore1) ? " (Winning)" :
+                                " (Losing)" ));
     }
 
-    @Override
     public void handleClick(int i, int j){
-        if(awaitForClick && BoardHelper.canPlay(board,turn,i,j)){
+        if(awaitForClick && BoardHelper.canPlay(board, turn, new Position(i, j))){
             mvcMessaging.notify("move:player",
                     (turn == 1) ?
                             ("Player 1 ") + "Made Move : "+ i + " , " + j :
@@ -221,7 +201,7 @@ public class GamePanel extends JPanel implements GameEngine, MessageHandler {
                     ("Player 2 ") + "Placed Piece : "+ i + " , " + j);
 
             //update board
-            board = BoardHelper.getNewBoardAfterMove(board,new Point(i,j),turn);
+            board = BoardHelper.makeMove(turn, board, new Position(i,j));
 
             //advance turn
             turn = (turn == 1) ? 2 : 1;
@@ -233,27 +213,6 @@ public class GamePanel extends JPanel implements GameEngine, MessageHandler {
             //callback
             manageTurn();
         }
-    }
-
-    private MessagePayload createPayload(int fieldNumber, int direction) {
-        return new MessagePayload(fieldNumber, direction);
-    }
-
-    public void handlePlayer(GamePlayer gamePlayer){
-        Point playerPlayPoint = gamePlayer.play(board);
-        int i = playerPlayPoint.x;
-        int j = playerPlayPoint.y;
-        if(!BoardHelper.canPlay(board,gamePlayer.myMark,i,j)) {
-            mvcMessaging.notify("move:player", "Player Played in Invalid Move : " + i + " , " + j);
-        }
-
-        //update board
-        board = BoardHelper.getNewBoardAfterMove(board,playerPlayPoint,turn);
-
-        //advance turn
-        turn = (turn == 1) ? 2 : 1;
-
-        repaint();
     }
 
     @Override

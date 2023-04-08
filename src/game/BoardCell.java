@@ -12,14 +12,14 @@ public class BoardCell extends JLabel implements MouseListener{
     int i;
     int j;
 
-    GameEngine ge;
+    GamePanel ge;
     JPanel parent;
 
     public int highlight = 0;
 
     public String text = "";
 
-    public BoardCell(GameEngine ge ,JPanel parent,int i,int j){
+    public BoardCell(GamePanel ge ,JPanel parent,int i,int j){
         this.ge = ge;
         this.parent = parent;
         this.i = i;
