@@ -122,7 +122,7 @@ public class BoardHelper {
         for (String direction : Directions.getDirections()) {
             Position directionVector = Directions.getVector(direction);
             if (makeMoveStep(playerToMove, board, positionToMove, directionVector, 0)) {
-                setSquare(playerToMove, board, positionToMove);
+                board = setSquare(playerToMove, board, positionToMove);
             }
         }
         return board;

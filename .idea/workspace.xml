@@ -7,24 +7,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" name="Default" comment="Replace GameEngine.java with GamePanel.java&#10;Replace Point ArrayList with stepping methods&#10;add setSquare method and can Play methods&#10;add Directions Class&#10;remove AI Timers&#10;makeMove Methods&#10;Position class implementation">
-      <change afterPath="$PROJECT_DIR$/src/game/Directions.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/game/Position.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/BoardCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/BoardCell.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/BoardHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/BoardHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/BoardPrinter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/GameEngine.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/GamePanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/GamePanel.java" afterDir="false" />
-    </list>
-    <list id="2657a3e1-893d-4062-b71b-ed4e6087fa11" name="Changes by student" comment="Changes by student">
-      <change afterPath="$PROJECT_DIR$/src/game/Player.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/BoardCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/BoardCell.java" afterDir="false" />
+    <list default="true" id="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" name="Default" comment="replace remaining print statements with mvc messaging">
       <change beforePath="$PROJECT_DIR$/src/game/BoardHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/BoardHelper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/GamePanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/GamePanel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/GamePlayer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/HumanPlayer.java" beforeDir="false" />
     </list>
+    <list id="2657a3e1-893d-4062-b71b-ed4e6087fa11" name="Changes by student" comment="Changes by student" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -250,64 +237,6 @@
   <component name="JsGulpfileManager">
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
-  </component>
-  <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/src/game/GamePanel.java">
-      <ranges>
-        <range start1="10" end1="11" start2="10" end2="11" changelist="2657a3e1-893d-4062-b71b-ed4e6087fa11" />
-        <range start1="30" end1="36" start2="30" end2="30" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="38" end1="39" start2="32" end2="32" changelist="2657a3e1-893d-4062-b71b-ed4e6087fa11" />
-        <range start1="43" end1="44" start2="36" end2="36" changelist="2657a3e1-893d-4062-b71b-ed4e6087fa11" />
-        <range start1="103" end1="115" start2="95" end2="95" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="122" end1="123" start2="102" end2="103" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="125" end1="127" start2="105" end2="106" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="129" end1="132" start2="108" end2="108" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="134" end1="135" start2="110" end2="111" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="139" end1="141" start2="115" end2="116" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="143" end1="146" start2="118" end2="118" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="148" end1="149" start2="120" end2="121" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="155" end1="156" start2="127" end2="128" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="161" end1="164" start2="133" end2="136" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="180" end1="181" start2="152" end2="153" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="187" end1="189" start2="159" end2="161" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="190" end1="191" start2="162" end2="163" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="192" end1="193" start2="164" end2="165" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="198" end1="200" start2="170" end2="172" changelist="2657a3e1-893d-4062-b71b-ed4e6087fa11" />
-        <range start1="205" end1="207" start2="177" end2="186" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="209" end1="210" start2="188" end2="188" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="211" end1="212" start2="189" end2="190" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="223" end1="224" start2="201" end2="202" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="236" end1="257" start2="214" end2="214" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-      </ranges>
-    </file>
-    <file path="$PROJECT_DIR$/src/game/BoardHelper.java">
-      <ranges>
-        <range start1="2" end1="5" start2="2" end2="2" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="8" end1="9" start2="5" end2="6" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="18" end1="20" start2="15" end2="17" changelist="2657a3e1-893d-4062-b71b-ed4e6087fa11" />
-        <range start1="34" end1="35" start2="31" end2="32" changelist="2657a3e1-893d-4062-b71b-ed4e6087fa11" />
-        <range start1="45" end1="47" start2="42" end2="58" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="49" end1="55" start2="60" end2="66" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="58" end1="59" start2="69" end2="70" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="61" end1="66" start2="72" end2="74" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="68" end1="207" start2="76" end2="92" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="208" end1="219" start2="93" end2="94" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="220" end1="230" start2="95" end2="98" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="231" end1="250" start2="99" end2="111" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="251" end1="265" start2="112" end2="112" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="267" end1="280" start2="114" end2="128" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="281" end1="283" start2="129" end2="130" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="285" end1="285" start2="132" end2="140" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-      </ranges>
-    </file>
-    <file path="$PROJECT_DIR$/src/game/BoardCell.java">
-      <ranges>
-        <range start1="14" end1="15" start2="14" end2="15" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="21" end1="22" start2="21" end2="22" changelist="5ccee63e-a0fa-4840-b8fb-e97bb953fea3" />
-        <range start1="92" end1="93" start2="92" end2="93" changelist="2657a3e1-893d-4062-b71b-ed4e6087fa11" />
-        <range start1="120" end1="121" start2="120" end2="120" changelist="2657a3e1-893d-4062-b71b-ed4e6087fa11" />
-      </ranges>
-    </file>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -774,7 +703,7 @@
       <workItem from="1680722148465" duration="21000" />
       <workItem from="1680722181521" duration="465000" />
       <workItem from="1680722778417" duration="8620000" />
-      <workItem from="1680893290834" duration="12633000" />
+      <workItem from="1680893290834" duration="12934000" />
     </task>
     <task id="LOCAL-00001" summary="remove all parts of ai">
       <created>1680807258983</created>
@@ -797,7 +726,21 @@
       <option name="project" value="LOCAL" />
       <updated>1680819629299</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Replace GameEngine.java with GamePanel.java&#10;Replace Point ArrayList with stepping methods&#10;add setSquare method and can Play methods&#10;add Directions Class&#10;remove AI Timers&#10;makeMove Methods&#10;Position class implementation">
+      <created>1680979379583</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1680979379583</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Changes by student">
+      <created>1680979406051</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1680979406051</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
@@ -855,7 +798,9 @@
     <MESSAGE value="rewrite MVC notifying String and payload" />
     <MESSAGE value="add workspace.xml" />
     <MESSAGE value="Replace GameEngine.java with GamePanel.java&#10;Replace Point ArrayList with stepping methods&#10;add setSquare method and can Play methods&#10;add Directions Class&#10;remove AI Timers&#10;makeMove Methods&#10;Position class implementation" />
-    <option name="LAST_COMMIT_MESSAGE" value="Replace GameEngine.java with GamePanel.java&#10;Replace Point ArrayList with stepping methods&#10;add setSquare method and can Play methods&#10;add Directions Class&#10;remove AI Timers&#10;makeMove Methods&#10;Position class implementation" />
+    <MESSAGE value="Changes by student" />
+    <MESSAGE value="replace remaining print statements with mvc messaging" />
+    <option name="LAST_COMMIT_MESSAGE" value="replace remaining print statements with mvc messaging" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
