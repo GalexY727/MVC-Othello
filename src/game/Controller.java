@@ -12,7 +12,6 @@ public class Controller extends JFrame {
 
         GamePanel gp = new GamePanel(mvcMessaging);
         this.add(gp);
-        //this.setSize(500,500);
     }
 
     public void init(){

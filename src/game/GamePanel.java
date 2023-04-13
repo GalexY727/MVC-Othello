@@ -88,7 +88,6 @@ public class GamePanel extends JPanel implements MessageHandler {
         mvcMessaging.subscribe("move:player", this);
         mvcMessaging.subscribe("game:finished", this);
 
-        //
         updateBoardInfo();
         updateTotalScore();
 
@@ -98,8 +97,17 @@ public class GamePanel extends JPanel implements MessageHandler {
 
     private boolean awaitForClick = false;
 
+	private boolean gameFinished(){
+		if (BoardHelper.anyMovesAvailable(board, 1) || 
+			BoardHelper.anyMovesAvailable(board, 2)){
+			return false;
+		} else {
+			return true;
+		}
+	}
+
     public void manageTurn(){
-        if(BoardHelper.anyMovesAvailable(board, 1) || BoardHelper.anyMovesAvailable(board, 2)) {
+        if(!gameFinished()) {
             updateBoardInfo();
             if (turn == 1) {
                 if(BoardHelper.anyMovesAvailable(board,1)) {
@@ -114,7 +122,6 @@ public class GamePanel extends JPanel implements MessageHandler {
             } else {
                 if(BoardHelper.anyMovesAvailable(board, 2)) {
                         awaitForClick = true;
-                        //after click this function should be call backed
                 }else{
                     //forfeit this move and pass the turn
                     mvcMessaging.notify("move:player", "Player 2 has no legal moves !");

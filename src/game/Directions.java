@@ -1,6 +1,4 @@
 package game;
-
-import java.awt.Point;
 /**
  * Set up HashMap with the compass rose directions and
  * pair with a vector that will implement the change
