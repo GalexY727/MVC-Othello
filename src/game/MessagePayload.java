@@ -9,33 +9,33 @@ package game;
  */
 public class MessagePayload {
   
-  private final int field;
-  private final int direction;
+  private final String message;
+  private final Position position;
   
   /**
    * Class constructor
    * @param _field Text field 1 or 2
    * @param _direction Direction (Constants.UP or Constants.DOWN)
    */
-  public MessagePayload(int _field, int _direction) {
-    field = _field;
-    direction = _direction;
+  public MessagePayload(String message, Position position) {
+    this.message = message;
+	this.position = position;
+  }
+
+  public MessagePayload createMessagePayload(String printOut) {
+	return new MessagePayload(printOut, null);
+  }
+
+  public MessagePayload createMessagePayload(String printOut, Position position) {
+	return new MessagePayload(printOut, position);
   }
   
-  /**
-   * Getter method for the direction
-   * @return Field value
-   */
-  public int getDirection() {
-    return direction;
+  public String getMessage() {
+	return this.message;
   }
-  
-  /**
-   * Getter method for the 
-   * @return 
-   */
-  public int getField() {
-    return field;
+
+  public Position getPosition() {
+	return this.position;
   }
-  
+
 }

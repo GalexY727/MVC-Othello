@@ -28,6 +28,7 @@ public class GamePanel extends JPanel implements MessageHandler {
     JLabel tscore2;
 
     private final Messenger mvcMessaging;
+	private MessagePayload messagePayload = new MessagePayload(null, null);
 
     public int getBoardValue(int i,int j){
         return board[i][j];
@@ -88,8 +89,8 @@ public class GamePanel extends JPanel implements MessageHandler {
         mvcMessaging.subscribe("move:player", this);
         mvcMessaging.subscribe("game:finished", this);
 
-        updateBoardInfo();
-        updateTotalScore();
+        updateBoardInfoCmd();
+        updateTotalScoreCmd();
 
 
         manageTurn();
@@ -108,14 +109,16 @@ public class GamePanel extends JPanel implements MessageHandler {
 
     public void manageTurn(){
         if(!gameFinished()) {
-            updateBoardInfo();
+
+			mvcMessaging.notify("view:boardUpdate", messagePayload.createMessagePayload("Board Updated"), true);
+
             if (turn == 1) {
                 if(BoardHelper.anyMovesAvailable(board,1)) {
                         awaitForClick = true;
                         //after click this function should be call backed
                 }else{
                     //forfeit this move and pass the turn
-                    mvcMessaging.notify("move:player", "Player 1 has no legal moves !");
+                    mvcMessaging.notify("move:player", messagePayload.createMessagePayload("Player 1 has no legal moves !"), true);
                     turn = 2;
                     manageTurn();
                 }
@@ -124,25 +127,18 @@ public class GamePanel extends JPanel implements MessageHandler {
                         awaitForClick = true;
                 }else{
                     //forfeit this move and pass the turn
-                    mvcMessaging.notify("move:player", "Player 2 has no legal moves !");
+                    mvcMessaging.notify("move:player", messagePayload.createMessagePayload("Player 2 has no legal moves !"), true);
                     turn = 1;
                     manageTurn();
                 }
             }
         }else{
             //game finished
-            mvcMessaging.notify("game:finished", "Game Finished !");
-            int winner = BoardHelper.getWinner(board);
-            if(winner==1) totalscore1++;
-            else if(winner==2) totalscore2++;
-            updateTotalScore();
-            //restart
-            resetBoard();
-            turn=1;
-            manageTurn();
+            mvcMessaging.notify("game:finished", messagePayload.createMessagePayload("Game Finished !"), true);
         }
     }
 
+	
     public void resetBoard(){
         board = new int[8][8];
         for (int i = 0; i < 8; i++) {
@@ -153,15 +149,31 @@ public class GamePanel extends JPanel implements MessageHandler {
         setBoardValue(3,4,1);
         setBoardValue(4,3,1);
         setBoardValue(4,4,2);
+    }    
+	
+    public void handleClick(int i, int j){
+        if(awaitForClick && BoardHelper.canPlay(board, turn, new Position(i, j))){
+            mvcMessaging.notify("move:player",
+                    (turn == 1) ?
+                            messagePayload.createMessagePayload(("Player 1 ") + "Made Move : "+ i + " , " + j,
+																new Position(i, j)) :
+                            messagePayload.createMessagePayload(("Player 2 ") + "Made Move : "+ i + " , " + j,
+																new Position(i, j)), 
+							true);
+
+            mvcMessaging.notify("view:buttonClicked",
+                    (turn == 1) ?
+                    messagePayload.createMessagePayload(("Player 1 ") + "Placed Piece : "+ i + " , " + j,
+														new Position(i, j)) :
+                    messagePayload.createMessagePayload(("Player 2 ") + "Placed Piece : "+ i + " , " + j,
+														new Position(i, j)), 
+					true);
+        }
     }
 
-    //update highlights on possible moves and scores
-    public void updateBoardInfo() {
-
-        int p1score = 0;
-        int p2score = 0;
-
-        for (int i = 0; i < 8; i++) {
+	private int[] getPlayerScoresCmd(int p1score, int p2score){
+		int[] scores = new int[2];
+		for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (board[i][j] == 1) p1score++;
                 if (board[i][j] == 2) p2score++;
@@ -173,39 +185,14 @@ public class GamePanel extends JPanel implements MessageHandler {
                 }
             }
         }
+		scores[0] = p1score;
+		scores[1] = p2score;
+		return scores;
+	}
 
-        score1.setText("Player 1: Black = " + p1score);
-        score2.setText("Player 2: White = " + p2score);
-        mvcMessaging.notify("view:boardUpdate", "Board Updated");
-
-    }
-
-    public void updateTotalScore(){
-        tscore1.setText("Player 1: Black = " + totalscore1 +
-                ((totalscore1 == totalscore2) ? " (Tied)" :
-                        (totalscore1 > totalscore2) ? " (Winning)" :
-                                " (Losing)" ));
-
-        tscore2.setText("Player 2: White = " + totalscore2 +
-                ((totalscore2 == totalscore1) ? " (Tied) " :
-                        (totalscore2 > totalscore1) ? " (Winning)" :
-                                " (Losing)" ));
-    }
-
-    public void handleClick(int i, int j){
-        if(awaitForClick && BoardHelper.canPlay(board, turn, new Position(i, j))){
-            mvcMessaging.notify("move:player",
-                    (turn == 1) ?
-                            ("Player 1 ") + "Made Move : "+ i + " , " + j :
-                            ("Player 2 ") + "Made Move : "+ i + " , " + j);
-
-            mvcMessaging.notify("view:buttonClicked",
-                    (turn == 1) ?
-                    ("Player 1 ") + "Placed Piece : "+ i + " , " + j :
-                    ("Player 2 ") + "Placed Piece : "+ i + " , " + j);
-
-            //update board
-            board = BoardHelper.makeMove(turn, board, new Position(i,j));
+	private void makeMoveCmd(Position position) {
+			//update board
+            board = BoardHelper.makeMove(turn, board, position);
 
             //advance turn
             turn = (turn == 1) ? 2 : 1;
@@ -216,20 +203,63 @@ public class GamePanel extends JPanel implements MessageHandler {
 
             //callback
             manageTurn();
-        }
+	}
+	
+	private void updateTotalScoreCmd(){
+        tscore1.setText("Player 1: Black = " + totalscore1 +
+                ((totalscore1 == totalscore2) ? " (Tied)" :
+                        (totalscore1 > totalscore2) ? " (Winning)" :
+                                " (Losing)" ));
+
+        tscore2.setText("Player 2: White = " + totalscore2 +
+                ((totalscore2 == totalscore1) ? " (Tied) " :
+                        (totalscore2 > totalscore1) ? " (Winning)" :
+                                " (Losing)" ));
+    }
+	
+	private void updateBoardInfoCmd() {
+
+        int p1score = 0;
+        int p2score = 0;
+
+        p1score = getPlayerScoresCmd(p1score, p2score)[0];
+		p2score = getPlayerScoresCmd(p1score, p2score)[1];
+
+        score1.setText("Player 1: Black = " + p1score);
+        score2.setText("Player 2: White = " + p2score);
+
     }
 
-    @Override
-    public void messageHandler(String message, Object messagePayload) {
-        // Remove the substring of "move:" or otherwise from the message
-        String messageName = message.substring(message.indexOf(":")+1);
-        String messageData = message.substring(0, message.indexOf(":"));
+	private void gameFinishedCmd(){
+		int winner = BoardHelper.getWinner(board);
+		if(winner==1) totalscore1++;
+		else if(winner==2) totalscore2++;
+		updateTotalScoreCmd();
+		//restart
+		resetBoard();
+		turn=1;
+		manageTurn();
+	}
 
-        if (messagePayload != null) {
-            System.out.printf("MSG: received by %s: "+messageName+" | "+messagePayload+"\n", messageData);
-        } else {
-            System.out.printf("MSG: received by %s: "+messageName+" | No data sent", messageData);
-        }
-        assert messagePayload != null;
+    @Override
+    public void messageHandler(String messageName, Object messagePayload) {
+		assert messageName != null : "Message name cannot be null";
+		
+		MessagePayload payload = (MessagePayload) messagePayload;
+		String message = payload.getMessage();
+		Position position = payload.getPosition();
+
+		if (position == null) {
+			switch (messageName){
+				case "game:finished" -> gameFinishedCmd();
+				case "view:boardUpdate" -> updateBoardInfoCmd();
+			}
+		}else {
+			switch (messageName){
+				case "view:buttonClicked" -> makeMoveCmd(position);
+			}
+		}
+		
+		System.out.println("\t"+message+"\n");
     }
 }
