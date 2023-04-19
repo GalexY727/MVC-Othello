@@ -86,7 +86,10 @@ public class GamePanel extends JPanel implements MessageHandler {
 
         mvcMessaging.subscribe("view:buttonClicked", this);
         mvcMessaging.subscribe("view:boardUpdate", this);
-        mvcMessaging.subscribe("move:player", this);
+		mvcMessaging.subscribe("move:player", this);
+		mvcMessaging.subscribe("move:player:waitForClick", this);
+        mvcMessaging.subscribe("move:player1", this);
+        mvcMessaging.subscribe("move:player2", this);
         mvcMessaging.subscribe("game:finished", this);
 
         updateBoardInfoCmd();
@@ -114,22 +117,18 @@ public class GamePanel extends JPanel implements MessageHandler {
 
             if (turn == 1) {
                 if(BoardHelper.anyMovesAvailable(board,1)) {
-                        awaitForClick = true;
+					mvcMessaging.notify("move:player:waitForClick", messagePayload.createMessagePayload("Player 1 Turn"), true);
                         //after click this function should be call backed
                 }else{
                     //forfeit this move and pass the turn
-                    mvcMessaging.notify("move:player", messagePayload.createMessagePayload("Player 1 has no legal moves !"), true);
-                    turn = 2;
-                    manageTurn();
+                    mvcMessaging.notify("move:player1", messagePayload.createMessagePayload("Player 1 has no legal moves !"), true);
                 }
             } else {
                 if(BoardHelper.anyMovesAvailable(board, 2)) {
-                        awaitForClick = true;
+					mvcMessaging.notify("move:player:waitForClick", messagePayload.createMessagePayload("Player 1 Turn"), true);
                 }else{
                     //forfeit this move and pass the turn
-                    mvcMessaging.notify("move:player", messagePayload.createMessagePayload("Player 2 has no legal moves !"), true);
-                    turn = 1;
-                    manageTurn();
+                    mvcMessaging.notify("move:player2", messagePayload.createMessagePayload("Player 2 has no legal moves !"), true);
                 }
             }
         }else{
@@ -138,6 +137,18 @@ public class GamePanel extends JPanel implements MessageHandler {
         }
     }
 
+	private void playerWaitForClickCmd(){
+		awaitForClick = true;
+	}
+
+	private void movePlayer1Cmd(){
+		turn = 2;
+		manageTurn();
+	}
+	private void movePlayer2Cmd(){
+		turn = 1;
+		manageTurn();
+	}
 	
     public void resetBoard(){
         board = new int[8][8];
@@ -153,22 +164,15 @@ public class GamePanel extends JPanel implements MessageHandler {
 	
     public void handleClick(int i, int j){
         if(awaitForClick && BoardHelper.canPlay(board, turn, new Position(i, j))){
-            mvcMessaging.notify("move:player",
-                    (turn == 1) ?
-                            messagePayload.createMessagePayload(("Player 1 ") + "Made Move : "+ i + " , " + j,
-																new Position(i, j)) :
-                            messagePayload.createMessagePayload(("Player 2 ") + "Made Move : "+ i + " , " + j,
-																new Position(i, j)), 
-							true);
+			if(turn == 1){
+				mvcMessaging.notify("move:player", messagePayload.createMessagePayload("Player 1 Made Move : "+ i + " , " + j, new Position(i, j)), true);
+				mvcMessaging.notify("view:buttonClicked", messagePayload.createMessagePayload(("Player 1 ") + "Placed Piece : "+ i + " , " + j, new Position(i, j)), true);
 
-            mvcMessaging.notify("view:buttonClicked",
-                    (turn == 1) ?
-                    messagePayload.createMessagePayload(("Player 1 ") + "Placed Piece : "+ i + " , " + j,
-														new Position(i, j)) :
-                    messagePayload.createMessagePayload(("Player 2 ") + "Placed Piece : "+ i + " , " + j,
-														new Position(i, j)), 
-					true);
-        }
+			}else{
+				mvcMessaging.notify("move:player", messagePayload.createMessagePayload("Player 2 Made Move : "+ i + " , " + j, new Position(i, j)), true);
+				mvcMessaging.notify("view:buttonClicked", messagePayload.createMessagePayload(("Player 2 ") + "Placed Piece : "+ i + " , " + j, new Position(i, j)), true);
+			}
+		}
     }
 
 	private int[] getPlayerScoresCmd(int p1score, int p2score){
@@ -253,10 +257,13 @@ public class GamePanel extends JPanel implements MessageHandler {
 			switch (messageName){
 				case "game:finished" -> gameFinishedCmd();
 				case "view:boardUpdate" -> updateBoardInfoCmd();
+				case "move:player:waitForClick" -> playerWaitForClickCmd();
 			}
 		}else {
 			switch (messageName){
 				case "view:buttonClicked" -> makeMoveCmd(position);
+				case "move:player1" -> movePlayer1Cmd();
+				case "move:player2" -> movePlayer2Cmd();
 			}
 		}
 		
