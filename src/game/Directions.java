@@ -8,12 +8,17 @@ package game;
  * @version 1.0
  */
 public class Directions {
+	
     /**
-     * Gets the requested direction vector
-     * @param compassPoint Direction whose vector we want to retrieve
-     * @return Direction vector
-     */
-    public static Position getVector(String compassPoint) {
+	 * The function takes a compass point as input and returns a Position object representing the
+	 * corresponding vector.
+	 * 
+	 * @param compassPoint a String representing a compass point (N, NE, E, SE, S, SW, W, NW)
+	 * @return The method is returning a Position object that represents a vector in a specific
+	 * direction based on the input compass point. If the input is not a valid compass point, the
+	 * method returns null.
+	 */
+	public static Position getVector(String compassPoint) {
         switch (compassPoint) {
             case "N":  return new Position(-1,0);
             case "NE": return new Position(-1,1);
@@ -27,12 +32,14 @@ public class Directions {
         return null;
     }
 
+	
     /**
-     * Gets an array of strings representing cardinal
-     * direction points
-     * @return Array of direction strings
-     */
-    public static String[] getDirections() {
+	 * The function returns an array of strings representing directions.
+	 * 
+	 * @return An array of strings representing the directions: "N", "NE", "E", "SE", "S", "SW", "W",
+	 * and "NW".
+	 */
+	public static String[] getDirections() {
         return new String[]{"N","NE","E","SE","S","SW","W","NW"};
     }
 
